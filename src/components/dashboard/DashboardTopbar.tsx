@@ -120,7 +120,7 @@ const DashboardTopbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-1.5 text-sm text-muted-foreground shrink-0">
-          <span className="font-semibold text-foreground dark:text-white">Velo</span>
+          <span className="font-semibold text-foreground dark:text-white">Fornece Cloud</span>
           <ChevronRight size={13} />
           <span>{pageTitle}</span>
         </div>
@@ -236,7 +236,7 @@ const DashboardTopbar = () => {
           <div className="absolute inset-0 bg-foreground/30" onClick={() => setMobileOpen(false)} />
           <div className="absolute bottom-0 left-0 top-0 w-[82vw] max-w-[320px] border-r border-border bg-background px-3 pb-4 pt-5 dark:border-transparent">
             <div className="mb-5 flex items-center justify-between px-2">
-              <span className="text-lg font-black text-foreground dark:text-white">Velo</span>
+              <span className="text-lg font-black text-foreground dark:text-white">Fornece Cloud</span>
               <button onClick={() => setMobileOpen(false)}><X size={20} /></button>
             </div>
             <div className="space-y-1">
