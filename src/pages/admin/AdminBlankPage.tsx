@@ -106,7 +106,7 @@ type ValidaPayBalance = {
 };
 
 type FinanceData = {
-  provider: "validapay";
+  provider: "validapay" | "cakto";
   source: "providers" | "database";
   activity_source?: "validapay_webhooks" | "database";
   balance?: ValidaPayBalance | null;
@@ -297,7 +297,7 @@ const hasPaymentReference = (subscription: SubscriptionRow) =>
 const isValidaPaySubscription = (subscription: SubscriptionRow) => {
   const provider = String(subscription.provider ?? "").trim().toLowerCase();
   const legacyPaymentId = String(subscription.mp_payment_id ?? "").trim();
-  return provider === "validapay" ||
+  return provider === "validapay" || provider === "cakto" ||
     !!subscription.validapay_charge_id ||
     !!subscription.validapay_subscription_id ||
     (!!legacyPaymentId && !/^\d+$/.test(legacyPaymentId));
@@ -601,8 +601,8 @@ const fetchAllSubscriptions = async (): Promise<SubscriptionRow[]> => {
     current_period_start: order.paid_at ? String(order.paid_at) : null,
     current_period_end: order.expires_at ? String(order.expires_at) : null,
     next_charge_at: null,
-    created_at: String(order.created_at),
-    updated_at: String(order.created_at),
+    created_at: String(order.paid_at ?? order.created_at),
+    updated_at: String(order.paid_at ?? order.created_at),
   })) as SubscriptionRow[];
 };
 
@@ -691,16 +691,25 @@ const toApiPeriod = (period: Period): "day" | "month" | "year" => {
 const providerMatchesPeriod = (period: Period) =>
   period === "today" || period === "this_month" || period === "year";
 
-const fetchFinanceData = async (period: Period): Promise<FinanceData> => {
-  const { data, error } = await supabase.functions.invoke("admin-wallet-finance", {
-    body: { period: toApiPeriod(period) },
-  });
-  if (error) throw error;
-  if (!data?.metrics || !data?.series) throw new Error("Resposta financeira incompleta");
-  if (data.provider !== "validapay") {
-    throw new Error("A consolidação financeira ainda não está isolada na ValidaPay");
-  }
-  return data as FinanceData;
+const fetchFinanceData = async (_period: Period): Promise<FinanceData> => {
+  // A cobrança atual é feita pela Cakto. O consolidado local usa payment_orders
+  // (carregados em fetchWalletData); não chamar a antiga função ValidaPay, que
+  // não existe neste projeto e deixava o painel inteiro em estado de erro.
+  return {
+    provider: "cakto",
+    source: "database",
+    activity_source: "database",
+    metrics: {
+      approved_sales: 0,
+      gross_revenue: 0,
+      refunds: 0,
+      fees: 0,
+      costs: 0,
+      withdrawals: 0,
+      net_revenue: 0,
+    },
+    series: { revenue: [], costs: [] },
+  };
 };
 
 const deduplicateSubscriptions = (subscriptions: SubscriptionRow[]) => {
@@ -874,7 +883,7 @@ const AdminPainelPage = () => {
     isLoading: isFinanceLoading,
     isFetching: isFinanceFetching,
   } = useQuery({
-    queryKey: ["admin-wallet-finance-v2-validapay-only", period],
+    queryKey: ["admin-wallet-finance-v2-cakto-only", period],
     queryFn: () => fetchFinanceData(period),
     // intervalo livre é calculado só com os dados locais
     enabled: period !== "custom",
@@ -1061,8 +1070,8 @@ const AdminPainelPage = () => {
   );
 
   const localFinance = useMemo<FinanceData>(() => ({
-    provider: "validapay",
-    source: data.validapayAvailable ? "providers" : "database",
+    provider: "cakto",
+    source: "database",
     activity_source: data.validapayAvailable ? "validapay_webhooks" : "database",
     metrics: {
       approved_sales: paidSubscriptionsInPeriod.length + approvedValidaPayActivities.length,
