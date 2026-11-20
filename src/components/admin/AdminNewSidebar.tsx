@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
@@ -37,6 +37,16 @@ export const AdminNewSidebar = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: unreadTickets = 0 } = useUnreadSupportTickets();
+  const [simulationOn, setSimulationOn] = useState(() => {
+    try { return window.localStorage.getItem("fornece:admin-simulation") === "on"; } catch { return false; }
+  });
+
+  const toggleSimulation = () => {
+    const next = !simulationOn;
+    setSimulationOn(next);
+    try { window.localStorage.setItem("fornece:admin-simulation", next ? "on" : "off"); } catch { /* storage indisponível */ }
+    window.dispatchEvent(new CustomEvent("fornece:admin-simulation-change", { detail: next }));
+  };
 
   useEffect(() => {
     if (!user?.id) return;
@@ -110,15 +120,21 @@ export const AdminNewSidebar = () => {
       </section>)}
       <div className="mt-7 border-t border-current/10 pt-4">
         <p className="admin-nav-section mb-2"><span>EXTRAS</span></p>
-        <ul>
-          <li><Link to="/admin/simulador" aria-current={matchesPath(pathname, "/admin/simulador") ? "page" : undefined}
-            data-active={matchesPath(pathname, "/admin/simulador") || undefined} className="admin-nav-item"
-            onMouseEnter={() => preloadAdminPage("/admin/simulador", queryClient)}
-            onFocus={() => preloadAdminPage("/admin/simulador", queryClient)}>
-            {matchesPath(pathname, "/admin/simulador") ? <motion.span layoutId="admin-nav-pill" aria-hidden="true" className="admin-nav-pill" /> : null}
-            <ChartLine aria-hidden="true" weight="fill" /><span className="min-w-0 flex-1 truncate">Simulador</span>
-          </Link></li>
-        </ul>
+        <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <ChartLine aria-hidden="true" weight="fill" className={simulationOn ? "text-violet-400" : ""} />
+            <div className="min-w-0">
+              <p className="truncate text-[13px] font-medium">Simulação</p>
+              <p className="text-[11px] text-current/55">{simulationOn ? "Modo ON" : "Modo OFF"}</p>
+            </div>
+          </div>
+          <button type="button" role="switch" aria-checked={simulationOn}
+            aria-label={simulationOn ? "Desativar modo de simulação" : "Ativar modo de simulação"}
+            onClick={toggleSimulation}
+            className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${simulationOn ? "bg-violet-500" : "bg-white/20"}`}>
+            <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${simulationOn ? "translate-x-[22px]" : "translate-x-0.5"}`} />
+          </button>
+        </div>
       </div>
       <ul className="mt-6"><li><Link to="/dashboard" className="admin-nav-item">
         <ArrowCircleLeft aria-hidden="true" weight="fill" /><span className="min-w-0 flex-1 truncate">Voltar ao Fornece Cloud</span>
