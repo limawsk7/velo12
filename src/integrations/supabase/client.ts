@@ -4,10 +4,13 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { brokeredPreviewStorage } from './previewAuthStorage';
 
-const SUPABASE_URL = "https://nqzpoioxvbqavrtphtoa.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xenBvaW94dmJxYXZydHBodG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNDMyNDgsImV4cCI6MjA5MDgxOTI0OH0.G1VlS8doiHQtooC2tyiiHbWl4h9kqoMSuirShDhhjzk";
+// As credenciais do backend são específicas da instalação e nunca devem ser
+// fixadas no repositório. Configure VITE_SUPABASE_URL e
+// VITE_SUPABASE_PUBLISHABLE_KEY no ambiente de deploy.
+const SUPABASE_URL = String(import.meta.env.VITE_SUPABASE_URL ?? "").trim();
+const SUPABASE_PUBLISHABLE_KEY = String(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "").trim();
 const SUPABASE_DISABLED =
-  import.meta.env.VITE_DISABLE_SUPABASE === 'true' || !SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY;
+  import.meta.env.VITE_DISABLE_SUPABASE === "true" || !SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY;
 
 const disabledError = {
   message:
