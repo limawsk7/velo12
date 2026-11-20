@@ -111,6 +111,7 @@ const ChatFornecedoresPage = lazy(() => import("./pages/dashboard/ChatFornecedor
 const DocumentacaoComunidadePage = lazy(() => import("./pages/dashboard/DocumentacaoComunidadePage"));
 const SugestoesPage = lazy(() => import("./pages/dashboard/SugestoesPage"));
 const DashboardHomePage = lazy(() => import("./pages/dashboard/DashboardHomePage"));
+const SalesDashboardPage = lazy(() => import("./pages/dashboard/SalesDashboardPage"));
 const AtlasChatPage = lazy(() => import("./pages/dashboard/AtlasChatPage"));
 const IntegracoesPage = lazy(() => import("./pages/dashboard/IntegracoesPage"));
 const AdicionarLojaShopifyPage = lazy(() => import("./pages/dashboard/AdicionarLojaShopifyPage"));
@@ -375,6 +376,7 @@ const App = () => (
               <Route path="/mercadopago/callback" element={<MercadoPagoCallbackPage />} />
               <Route path="/dashboard" element={<DashboardShell />}>
                 <Route index element={<DashboardIndexPosLogin />} />
+                <Route path="dashboard" element={<SalesDashboardPage />} />
                 <Route path="atlas" element={<AtlasChatPage />} />
                 <Route path="atlas/:threadId" element={<AtlasChatPage />} />
                 <Route path="avatares" element={<AvataresPage />} />
