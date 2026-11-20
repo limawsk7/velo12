@@ -337,6 +337,7 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
         titulo: title,
         categoria: product.category,
         preco: sellPrice,
+        descricaoOriginal: product.description,
       });
       setDescription(texto);
       veloToast.success("Descrição gerada", { id: toastId });
