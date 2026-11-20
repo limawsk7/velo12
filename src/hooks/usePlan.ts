@@ -41,7 +41,7 @@ export const usePlan = (): PlanState => {
     const fetchPlan = async () => {
       // Compras Cakto são a fonte de verdade para os planos vendidos nesta landing.
       // A RPC só retorna a própria assinatura e também rebaixa o plano quando vence.
-      const { data: caktoData, error: caktoError } = await supabase.rpc("get_my_cakto_entitlement");
+      const { data: caktoData, error: caktoError } = await supabase.rpc("get_my_cakto_entitlement" as never);
       if (caktoError) console.warn("[usePlan] failed to load Cakto entitlement", caktoError);
       const cakto = Array.isArray(caktoData) ? caktoData[0] : caktoData;
       if (!cancelled && cakto?.has_cakto_order) {
