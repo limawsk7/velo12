@@ -88,7 +88,7 @@ export default function SupportAssistantWidget() {
           className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[#2563EB] px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#2563EB]"
           aria-label="Abrir ajuda"
         >
-          <LifeBuoy size={18} /> Ajuda
+          <LifeBuoy size={18} /> Cloud Suporte
         </button>
       )}
       {open && (
