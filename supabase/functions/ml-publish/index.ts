@@ -885,13 +885,14 @@ Deno.serve(async (req) => {
       } catch { return [] }
     })()
 
-    const MIN_REQUIRED_IMAGES = 3
-    const allPublicImages = rawImages.filter(isPublicUrl)
-    if (allPublicImages.length < MIN_REQUIRED_IMAGES) {
+    // O Mercado Livre recebe as URLs públicas do fornecedor diretamente.
+    // Não fazemos análise visual, chamada de IA, cache ou fila de revisão.
+    const allPublicImages = rawImages.filter(isPublicUrl);
+    if (allPublicImages.length === 0) {
       return json({
-        error: `O Mercado Livre exige no mínimo ${MIN_REQUIRED_IMAGES} fotos para publicar. Este produto tem apenas ${allPublicImages.length} foto(s) pública(s). Adicione mais imagens antes de publicar (imagens locais não são aceitas).`,
-        code: 'INSUFFICIENT_IMAGES',
-      }, 400)
+        error: 'Este produto não possui nenhuma foto pública válida para enviar ao Mercado Livre.',
+        code: 'NO_PUBLIC_IMAGES',
+      }, 400);
     }
 
     console.log('user_id:', user_id)
@@ -1001,94 +1002,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    // O ML pausa anúncios cujas fotos sejam artes/infográficos do fornecedor
-    // ("Ajuste o título e/ou substitua as fotos"). Nunca recoloque uma imagem
-    // recusada só para atingir o mínimo: é preferível bloquear a publicação a
-    // criar um anúncio que será penalizado logo depois.
-    let publicImages = allPublicImages.slice(0, 6)
-    try {
-      // Mesma régua (e mesmo cache de vereditos) usada na auditoria do catálogo.
-      const visionClient = createClient(
-        Deno.env.get('DB_URL') ?? supabaseUrl ?? '',
-        Deno.env.get('DB_SERVICE_ROLE_KEY') ?? serviceRoleKey ?? '',
-        { auth: { persistSession: false } },
-      )
-      const filtered = await filterCleanImagesCached(visionClient, allPublicImages, {
-        max: 6,
-        publication: { productId: product.id, title: product.title, background: isInternalRepair },
-        // Admin end-to-end test: validate_only + analyze_images runs the real
-        // photo review, then stops at /items/validate (no listing is created).
-        dryRun: body.validate_only === true && body.analyze_images !== true,
-      })
-      if (filtered.internalErrors?.length) {
-        console.error('[ml-publish] erro interno na conferência de fotos:', JSON.stringify(filtered.internalErrors.slice(0, 5)))
-        const { error: internalLogError } = await visionClient.from('ml_publish_errors').insert({
-          user_id, product_title: product.title, http_status: 500,
-          mapped_code: 'IMAGE_REVIEW_INTERNAL_ERROR',
-          mapped_message: 'Erro interno na conferência de fotos (ao reservar ou gravar o resultado).',
-          raw_response: { product_id: product.id ?? null, errors: filtered.internalErrors.slice(0, 20), revision: IMAGE_VALIDATION_REVISION, background: isInternalRepair },
-        })
-        if (internalLogError) console.warn('[ml-publish] falha ao gravar IMAGE_REVIEW_INTERNAL_ERROR:', internalLogError.message)
-      }
-      if (filtered.rejected.length) {
-        console.warn('[ml-publish] fotos recusadas (arte/texto promocional):',
-          filtered.rejected.map(r => `${r.url} → ${r.reason}`).slice(0, 8))
-      }
-      // This requested publication path requires three approved photos and a primary.
-      if (filtered.clean.length < 3) {
-        const decision = imageProductDecision(filtered)
-        const diagnostic = {
-          decision,
-          rejected: filtered.rejected,
-          primary_rejected: filtered.primaryRejected ?? [],
-          inconclusive: filtered.inconclusive,
-          secondary_approved: filtered.secondaryApproved ?? [],
-          revision: IMAGE_VALIDATION_REVISION,
-        }
-        // Keep failures attributable to a user/product even before the ML request.
-        console.warn('[ml-publish] image-validation-result', JSON.stringify({ user_id, product_id: product.id, ...diagnostic }))
-        const code = decision === 'no_primary' ? 'NO_ELIGIBLE_PRIMARY_IMAGE'
-          : decision === 'inconclusive' ? 'IMAGE_COMPLIANCE_UNAVAILABLE' : 'INSUFFICIENT_COMPLIANT_IMAGES'
-        const message = decision === 'no_primary'
-          ? 'As fotos não passaram nas regras do Mercado Livre. A foto principal precisa mostrar só o produto, com fundo limpo e sem texto. Nenhum anúncio foi enviado.'
-          : decision === 'inconclusive'
-          ? 'Nossa conferência de fotos está instável agora. Seu pedido ficou salvo; vamos tentar novamente e avisar aqui na Velo.'
-          : 'As fotos não passaram nas regras do Mercado Livre. A foto principal precisa mostrar só o produto, com fundo limpo e sem texto. Nenhum anúncio foi enviado.'
-        const { error: diagnosticError } = await visionClient.from('ml_publish_errors').insert({
-          user_id, product_title: product.title, http_status: decision === 'inconclusive' ? 503 : 409,
-          mapped_code: code, mapped_message: message, raw_response: diagnostic,
-        })
-        if (diagnosticError) console.warn('[ml-publish] falha ao gravar diagnóstico de fotos:', diagnosticError.message)
-        if (decision === 'no_primary') {
-          return json({ error: message, code, primary_rejected: diagnostic.primary_rejected }, 409)
-        }
-        if (decision === 'inconclusive') {
-          if (body.validate_only === true || isInternalRepair) return json({ error: message, code: 'IMAGE_COMPLIANCE_UNAVAILABLE', retry_kind: filtered.creditUnavailable ? 'credit' : 'temporary' }, 503)
-          return json(await queueImagePublication(supabase, user_id, product, productLimit, monthlyLimit), 202)
-        }
-        return json({
-          error: 'As fotos não passaram nas regras do Mercado Livre. A foto principal precisa mostrar só o produto, com fundo limpo e sem texto. Nenhum anúncio foi enviado.',
-          code: 'INSUFFICIENT_COMPLIANT_IMAGES',
-          rejected_images: filtered.rejected.length,
-        }, 409)
-      }
-      publicImages = filtered.clean
-
-    } catch (err) {
-      console.error('[ml-publish] filtro visual de imagens indisponível:', String(err))
-      // Internal failures (database/code) must be visible, not just a log line.
-      try {
-        const { error: internalLogError } = await supabase.from('ml_publish_errors').insert({
-          user_id, product_title: product.title, http_status: 500,
-          mapped_code: 'IMAGE_REVIEW_INTERNAL_ERROR',
-          mapped_message: 'Erro interno na conferência de fotos (antes de chamar a IA ou ao gravar o resultado).',
-          raw_response: { error: String(err).slice(0, 1000), product_id: product.id ?? null, revision: IMAGE_VALIDATION_REVISION, background: isInternalRepair },
-        })
-        if (internalLogError) console.warn('[ml-publish] falha ao gravar IMAGE_REVIEW_INTERNAL_ERROR:', internalLogError.message)
-      } catch (logErr) { console.warn('[ml-publish] falha ao gravar IMAGE_REVIEW_INTERNAL_ERROR:', String(logErr)) }
-      if (body.validate_only === true || isInternalRepair) return json({ error: 'Conferência de fotos indisponível', code: 'IMAGE_COMPLIANCE_UNAVAILABLE', internal_code: 'IMAGE_REVIEW_INTERNAL_ERROR' }, 503)
-      return json(await queueImagePublication(supabase, user_id, product, productLimit, monthlyLimit), 202)
-    }
+    // Publicação direta: usar as imagens públicas fornecidas pelo catálogo,
+    // sem conferência por IA, cache de visão ou fila de aprovação.
+    // O Mercado Livre fará a validação final ao receber o anúncio.
+    const publicImages = allPublicImages.slice(0, 10);
 
     if (body.validate_only === true && body.images_only === true) {
       return json({ validate_only: true, images_only: true, approved_images: publicImages, ai_calls: body.analyze_images === true ? undefined : 0 })
