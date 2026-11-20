@@ -28,6 +28,7 @@ type NavItem = {
 
 const baseNavItems: NavItem[] = [
   { id: "inicio", label: "Início", icon: Home, to: "/dashboard", end: true },
+  { id: "dashboard-vendas", label: "Dashboard", icon: TrendingUp, to: "/dashboard/dashboard" },
   {
     // Categoria expansível (como "Products" da referência): agrupa catálogo,
     // páginas com IA e modelos de produto.
@@ -125,6 +126,7 @@ const NAV_CSS = `
 
 const tourTargetByLabel: Record<string, string> = {
   Início: "inicio",
+  Dashboard: "dashboard-vendas",
   Catálogo: "catalogo",
   "Produtos em Alta": "produtos-em-alta",
   Publicações: "publicacoes",
