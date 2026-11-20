@@ -404,7 +404,7 @@ export const styles = {
     borderRadius: 11,
     padding: "7px 9px",
     background: "transparent",
-    color: "#171717",
+    color: "#F3F4F6",
     textAlign: "left",
     cursor: "pointer",
   } satisfies CSSProperties,
@@ -427,12 +427,12 @@ export const styles = {
     width: 15,
     height: 15,
     flexShrink: 0,
-    color: "rgba(10,10,10,0.74)",
+    color: "rgba(229,231,235,0.78)",
   } satisfies CSSProperties,
   profileMenuDivider: {
     height: 1,
     margin: "5px 6px",
-    background: "rgba(10,10,10,0.07)",
+    background: "rgba(255,255,255,0.12)",
   } satisfies CSSProperties,
   profilePanel: {
     position: "absolute",
