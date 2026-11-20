@@ -146,11 +146,11 @@ export function VeloLogo({ size = "md", variant = "dark" }: VeloLogoProps) {
         iPhone desde o iOS 14.
       */}
       <img
-        src="/landing/logo-96.webp"
+        src="/fornece-cloud.svg"
         onError={(evento) => {
           const img = evento.currentTarget;
-          if (img.src.endsWith("/logo.png")) return;
-          img.src = "/logo.png";
+          if (img.src.endsWith("/fornece-cloud.svg")) return;
+          img.src = "/fornece-cloud.svg";
         }}
         alt=""
         width={s.icon}
@@ -167,7 +167,7 @@ export function VeloLogo({ size = "md", variant = "dark" }: VeloLogoProps) {
           lineHeight: 1,
         }}
       >
-        Velo
+        Fornece Cloud
       </span>
     </div>
   );
