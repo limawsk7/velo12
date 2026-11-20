@@ -39,6 +39,18 @@ export const usePlan = (): PlanState => {
     let cancelled = false;
 
     const fetchPlan = async () => {
+      // Compras Cakto são a fonte de verdade para os planos vendidos nesta landing.
+      // A RPC só retorna a própria assinatura e também rebaixa o plano quando vence.
+      const { data: caktoData, error: caktoError } = await supabase.rpc("get_my_cakto_entitlement");
+      if (caktoError) console.warn("[usePlan] failed to load Cakto entitlement", caktoError);
+      const cakto = Array.isArray(caktoData) ? caktoData[0] : caktoData;
+      if (!cancelled && cakto?.has_cakto_order) {
+        const caktoPlan = NORMALIZE[String(cakto.plan ?? "gratis")] ?? "gratis";
+        const caktoStatus = cakto.status === "active" ? "active" : cakto.status === "cancelled" ? "cancelled" : "inactive";
+        setState({ plan: caktoPlan, status: caktoStatus, loading: false });
+        return;
+      }
+
       // 1. Check active subscription first.
       // O Mercado Pago grava a assinatura com status "active", mas também
       // "paid"/"approved" (pagamento confirmado) e "trialing" (em teste). Se
