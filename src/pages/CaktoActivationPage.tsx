@@ -8,6 +8,7 @@ const CaktoActivationPage = () => {
   const [email, setEmail] = useState("");
   const [paymentId, setPaymentId] = useState("");
   const [actionLink, setActionLink] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [existingAccount, setExistingAccount] = useState(false);
@@ -32,6 +33,7 @@ const CaktoActivationPage = () => {
       }
 
       if (!data?.actionLink) throw new Error("Não recebemos o link seguro de ativação. Tente novamente.");
+      setSelectedPlan(data.plan || "");
       setActionLink(data.actionLink);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ocorreu um erro inesperado. Tente novamente.");
@@ -58,7 +60,7 @@ const CaktoActivationPage = () => {
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300">Compra localizada</p>
             <h1 className="text-[27px] font-semibold tracking-[-0.04em] text-white">Seu acesso está quase pronto.</h1>
             <p className="mx-auto mt-3 max-w-[340px] text-sm leading-6 text-white/55">
-              Confirmamos seu pedido Business. Continue para criar uma senha pessoal e acessar sua conta.
+              {selectedPlan ? `Confirmamos sua compra do plano ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}.` : "Confirmamos sua compra."} Continue para criar uma senha pessoal e acessar sua conta.
             </p>
             <button
               type="button"
@@ -78,7 +80,7 @@ const CaktoActivationPage = () => {
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-400/10 text-blue-300">
                 <ShieldCheck size={27} />
               </div>
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-300">Fornece Cloud Business</p>
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-300">Fornece Cloud</p>
               <h1 className="text-[27px] font-semibold tracking-[-0.04em] text-white">Ative seu acesso</h1>
               <p className="mx-auto mt-3 max-w-[350px] text-sm leading-6 text-white/50">
                 Informe os dados da compra aprovada na Cakto para receber seu acesso seguro e definir sua senha.
