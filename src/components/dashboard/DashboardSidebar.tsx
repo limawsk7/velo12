@@ -222,7 +222,7 @@ const SidebarNavLink = ({ item, active, sub = false, reduce }: { item: NavItem; 
     ...(sub ? styles.navSubLinkBase : styles.navLinkBase),
     position: "relative",
     isolation: "isolate",
-    color: active ? (sub ? "#1D4ED8" : "#FFFFFF") : "#0A0A0A",
+    color: active ? (sub ? "#1D4ED8" : "#FFFFFF") : "#F3F4F6",
   };
 
   return (
@@ -269,7 +269,7 @@ const SidebarCategory = ({
     textAlign: "left",
     position: "relative",
     isolation: "isolate",
-    color: childActive ? "#FFFFFF" : "#0A0A0A",
+    color: childActive ? "#FFFFFF" : "#F3F4F6",
     justifyContent: "space-between",
   };
 
@@ -674,7 +674,7 @@ const DashboardSidebar = () => {
         <button
           type="button"
           onClick={() => navigate("/dashboard/comunidade")}
-          style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", border: 0, background: "transparent", padding: "6px 9px", marginBottom: 7, cursor: "pointer", textAlign: "left", color: "#0A0A0A", borderRadius: 8 }}
+          style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", border: 0, background: "transparent", padding: "6px 9px", marginBottom: 7, cursor: "pointer", textAlign: "left", color: "#F3F4F6", borderRadius: 8 }}
         >
           <Info size={17} strokeWidth={2} aria-hidden="true" />
           <span style={{ fontSize: 14, lineHeight: "19px", fontWeight: 500, letterSpacing: "-0.02em" }}>Comunidade e Ajuda</span>
