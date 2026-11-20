@@ -92,8 +92,8 @@ export default function SupportAssistantWidget() {
         </button>
       )}
       {open && (
-        <div className="fixed inset-x-2 bottom-2 z-50 flex h-[75vh] flex-col overflow-hidden rounded-2xl border border-[#E5E7EB] bg-[#101318] text-zinc-100 shadow-2xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:h-[560px] sm:w-[380px] dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex items-center gap-3 bg-[#1E3A8A] px-4 py-3 text-white">
+        <div className="fixed inset-x-2 bottom-2 z-50 flex h-[75vh] flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-[#101318] text-zinc-100 shadow-2xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:h-[560px] sm:w-[380px] dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex items-center gap-3 bg-[#2563EB] px-4 py-3 text-white">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15"><LifeBuoy size={18} /></div>
             <div className="flex-1">
               <p className="text-sm font-semibold">Cloud Suporte</p>
@@ -148,7 +148,7 @@ function Bolha({ role, content }: { role: Msg["role"]; content: string }) {
   return (
     <div className="max-w-[92%]">
       {role === "admin" && <p className="mb-1 text-[11px] font-semibold text-[#1E3A8A] dark:text-blue-300">Cloud Suporte</p>}
-      <div className={`prose prose-sm max-w-none text-zinc-100 prose-invert [&_a]:text-[#2563EB] ${role === "admin" ? "rounded-2xl border border-[#BFDBFE] bg-[#EFF6FF] px-3 py-2 dark:border-blue-900 dark:bg-blue-950/40" : ""}`}>
+      <div className={`prose prose-sm max-w-none text-zinc-100 prose-invert [&_a]:text-[#2563EB] ${role === "admin" ? "rounded-2xl border border-blue-900/60 bg-blue-950/30 px-3 py-2" : ""}`}>
         <ReactMarkdown components={{ a: ({ href, children }) => <a href={href} target="_blank" rel="noreferrer">{children}</a> }}>{content}</ReactMarkdown>
       </div>
     </div>
