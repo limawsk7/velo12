@@ -572,8 +572,8 @@ export default function Index() {
   };
 
   const authTarget = !authLoading && user ? "/dashboard" : "/login";
-  // Botão principal do celular: quem ainda não tem conta cai direto no passo de cadastro.
-  const signupTarget = !authLoading && user ? "/dashboard" : "/login?novo=1";
+  // Acesso público temporariamente limitado ao login.
+  const signupTarget = authTarget;
   const ctaLabel = !authLoading && user ? "Entrar no dashboard" : "Começar agora";
   const logado = !authLoading && Boolean(user);
   const lojistasAtivos = Math.max(
@@ -803,7 +803,7 @@ export default function Index() {
                 }}
                 className="text-[15px] font-medium text-white underline decoration-white/70 underline-offset-[5px] sm:hidden"
               >
-                {!authLoading && user ? "Painel" : "Criar conta"}
+                {!authLoading && user ? "Painel" : "Entrar"}
               </button>
             )}
             <button
@@ -1094,7 +1094,7 @@ export default function Index() {
               className="block h-auto w-full"
             />
           </div>
-          <button type="button" onClick={() => { registrarCliqueCadastro("cta_profit_signup_click"); navigate(signupTarget); }} className="mt-8 h-[56px] w-full rounded-full bg-[#2563EB] text-[17px] font-semibold text-white sm:hidden">Criar minha conta</button>
+          <button type="button" onClick={() => { registrarCliqueCadastro("cta_profit_signup_click"); navigate(signupTarget); }} className="mt-8 h-[56px] w-full rounded-full bg-[#2563EB] text-[17px] font-semibold text-white sm:hidden">Entrar</button>
         </div>
       </section>
 
@@ -1263,7 +1263,7 @@ export default function Index() {
                 {!authLoading && user ? "Entrar no dashboard" : "Começar agora"}
               </button>
             </form>
-            <button type="button" onClick={() => { registrarCliqueCadastro("cta_final_signup_click"); navigate(signupTarget); }} className="mt-8 h-[56px] w-full rounded-full bg-[#2563EB] text-[17px] font-semibold text-white sm:hidden">Criar minha conta</button>
+            <button type="button" onClick={() => { registrarCliqueCadastro("cta_final_signup_click"); navigate(signupTarget); }} className="mt-8 h-[56px] w-full rounded-full bg-[#2563EB] text-[17px] font-semibold text-white sm:hidden">Entrar</button>
 
             <p className="mt-5 hidden text-[14px] tracking-[-0.01em] text-[#8A97B1] sm:block">
               Você concorda em receber e-mails de marketing da Fornece Cloud.
@@ -1277,7 +1277,7 @@ export default function Index() {
       <AnimatePresence>
         {showMobileStickyCta && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className={`fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-black/90 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md sm:hidden ${FONTE_INTER}`}>
-            <button type="button" onClick={() => { registrarCliqueCadastro("cta_sticky_signup_click"); navigate(signupTarget); }} className="mx-auto block h-[52px] w-full max-w-[360px] rounded-full bg-white text-[17px] font-medium text-black active:scale-[0.98]">{logado ? "Ir para o painel" : "Criar minha conta"}</button>
+            <button type="button" onClick={() => { registrarCliqueCadastro("cta_sticky_signup_click"); navigate(signupTarget); }} className="mx-auto block h-[52px] w-full max-w-[360px] rounded-full bg-white text-[17px] font-medium text-black active:scale-[0.98]">{logado ? "Ir para o painel" : "Entrar"}</button>
           </motion.div>
         )}
       </AnimatePresence>
