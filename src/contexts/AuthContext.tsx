@@ -29,18 +29,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     let mounted = true;
     let initialSessionValidated = false;
 
+    // Sem backend configurado, não invente uma sessão nem conceda admin.
+    // O acesso só é liberado após autenticação real no Supabase.
     if (!isSupabaseEnabled) {
-      setUser(
-        ({
-          id: "dev-user",
-          email: "dev@local",
-          app_metadata: {},
-          user_metadata: {},
-          aud: "authenticated",
-          created_at: new Date().toISOString(),
-        } as unknown) as User
-      );
-      setRole("admin");
+      setSession(null);
+      setUser(null);
+      setRole(null);
       setLoading(false);
       return () => {
         mounted = false;
