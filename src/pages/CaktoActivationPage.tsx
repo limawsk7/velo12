@@ -1,12 +1,12 @@
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Loader2, LockKeyhole, Mail, ReceiptText, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2, LockKeyhole, Mail, UserRound, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { VeloLogo } from "@/components/VeloLogo";
 
 const CaktoActivationPage = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [paymentId, setPaymentId] = useState("");
   const [actionLink, setActionLink] = useState("");
   const [selectedPlan, setSelectedPlan] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ const CaktoActivationPage = () => {
 
     try {
       const { data, error: invokeError } = await supabase.functions.invoke("cakto-activation", {
-        body: { email: email.trim().toLowerCase(), paymentId: paymentId.trim() },
+        body: { name: name.trim(), email: email.trim().toLowerCase() },
       });
 
       if (invokeError || data?.error) {
@@ -83,11 +83,25 @@ const CaktoActivationPage = () => {
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-300">Fornece Cloud</p>
               <h1 className="text-[27px] font-semibold tracking-[-0.04em] text-white">Ative seu acesso</h1>
               <p className="mx-auto mt-3 max-w-[350px] text-sm leading-6 text-white/50">
-                Informe os dados da compra aprovada na Cakto para receber seu acesso seguro e definir sua senha.
+                Informe seu nome e o e-mail utilizado na compra. Vamos localizar seu pagamento aprovado e liberar a criação da senha.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <label className="block">
+                <span className="mb-2 flex items-center gap-2 text-xs font-medium text-white/65"><UserRound size={14} /> Seu nome completo</span>
+                <input
+                  type="text"
+                  autoComplete="name"
+                  required
+                  minLength={2}
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder="Como podemos te chamar?"
+                  className="w-full rounded-xl border border-white/[0.09] bg-white/[0.035] px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-blue-400/50 focus:bg-white/[0.055]"
+                />
+              </label>
+
               <label className="block">
                 <span className="mb-2 flex items-center gap-2 text-xs font-medium text-white/65"><Mail size={14} /> E-mail usado na compra</span>
                 <input
@@ -99,23 +113,6 @@ const CaktoActivationPage = () => {
                   placeholder="voce@email.com"
                   className="w-full rounded-xl border border-white/[0.09] bg-white/[0.035] px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-blue-400/50 focus:bg-white/[0.055]"
                 />
-              </label>
-
-              <label className="block">
-                <span className="mb-2 flex items-center gap-2 text-xs font-medium text-white/65"><ReceiptText size={14} /> Número do pedido Cakto</span>
-                <input
-                  type="text"
-                  autoComplete="off"
-                  required
-                  minLength={8}
-                  value={paymentId}
-                  onChange={(event) => setPaymentId(event.target.value)}
-                  placeholder="Cole o ID do pedido"
-                  className="w-full rounded-xl border border-white/[0.09] bg-white/[0.035] px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-blue-400/50 focus:bg-white/[0.055]"
-                />
-                <span className="mt-2 block text-[11px] leading-5 text-white/35">
-                  Você encontra o número no e-mail de confirmação da Cakto, em “Pagamento confirmado” ou nos detalhes do pedido.
-                </span>
               </label>
 
               {error ? (
@@ -131,7 +128,7 @@ const CaktoActivationPage = () => {
 
               <button
                 type="submit"
-                disabled={loading || !email.trim() || !paymentId.trim()}
+                disabled={loading || !name.trim() || !email.trim()}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#397eea] px-5 py-4 text-sm font-semibold text-white transition hover:bg-[#4c8df5] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? <><Loader2 size={16} className="animate-spin" /> Verificando compra...</> : <>Verificar e continuar <ArrowRight size={17} /></>}
