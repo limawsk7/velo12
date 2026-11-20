@@ -14,7 +14,6 @@ import {
   LogOut,
   type LucideIcon,
   MessagesSquare,
-  PackageSearch,
   RefreshCcw,
   ShoppingBag,
   Stethoscope,
