@@ -62,7 +62,10 @@ const CaktoActivationPage = () => {
             </p>
             <button
               type="button"
-              onClick={() => window.location.assign(actionLink)}
+              onClick={() => {
+                try { window.sessionStorage.setItem("cakto_activation_flow", "1"); } catch { /* storage indisponível */ }
+                window.location.assign(actionLink);
+              }}
               className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-[#397eea] px-5 py-4 text-sm font-semibold text-white transition hover:bg-[#4c8df5]"
             >
               Criar minha senha <ArrowRight size={17} />
