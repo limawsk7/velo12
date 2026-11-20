@@ -73,7 +73,8 @@ const PILL_EASE = [0.4, 0, 0.2, 1] as const;
 
 // Hover/foco dos itens (inline styles não fazem :hover, então injetamos CSS).
 const NAV_CSS = `
-.velo-nav-item, .velo-nav-sub { transition: background-color 150ms ease-out, color 150ms ease-out; outline: none; }
+.velo-nav-item, .velo-nav-sub { transition: background-color 150ms ease-out, color 150ms ease-out; outline: none !important; border: 0 !important; box-shadow: none; }
+.velo-nav-item:focus, .velo-nav-sub:focus, .velo-nav-item:focus-visible, .velo-nav-sub:focus-visible { outline: none !important; box-shadow: none !important; }
 .velo-nav-item:hover:not([data-active="true"]) { background-color: rgba(255,255,255,0.055); }
 .velo-nav-sub:hover:not([data-active="true"]) { background-color: rgba(255,255,255,0.045); }
 .velo-nav-ico { transition: transform 150ms ease-out; }
