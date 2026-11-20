@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { X, Check, Loader2, Sparkles, Globe, ExternalLink, ArrowRight, Store, ShieldCheck, CheckCircle2, Link2 } from "lucide-react";
+import { X, Check, Loader2, Globe, ExternalLink, ArrowRight, Store, ShieldCheck, CheckCircle2, Link2 } from "lucide-react";
 import { veloToast } from "@/components/ui/velo-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -1052,9 +1052,7 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
                   loadingLabels={
                     publishing
                       ? ["Publicando…", "Criando anúncio…", "Finalizando…"]
-                      : false
-                        ? ["Preparando descrição…"]
-                        : ["Verificando conta…"]
+                      : ["Verificando conta…"]
                   }
                   label={planLimits.canPublishProducts ? "Publicar produto" : "Continuar para o plano"}
                 />
