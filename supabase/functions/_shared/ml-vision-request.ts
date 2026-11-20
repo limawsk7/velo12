@@ -73,6 +73,13 @@ async function requestDirectGemini(input: string, primary: boolean) {
 }
 
 export async function requestImageVision(input: string, runId?: string, primary = false, model: VisionModel = IMAGE_VISION_MODEL) {
+  // In this deployment the Lovable gateway key is not configured. Prefer the
+  // Gemini key already stored in Supabase Secrets, so photo checks do not
+  // depend on LOVABLE_API_KEY or silently queue every publication.
+  if (Deno.env.get('GEMINI_API_KEY')) {
+    return await requestDirectGemini(input, primary);
+  }
+
   const request = {
     model,
     messages: [
