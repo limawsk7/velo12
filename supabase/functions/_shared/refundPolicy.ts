@@ -1,4 +1,4 @@
-// Regra e textos do reembolso da assinatura Velo — fonte única.
+// Regra e textos do reembolso da assinatura Fornece Cloud — fonte única.
 // Usado pelo site (src/lib/refundEligibility.ts reexporta), pela IA de suporte
 // e pelas funções request-refund / admin-refund-action.
 // Sem imports: precisa rodar tanto no Deno quanto no Vite.
