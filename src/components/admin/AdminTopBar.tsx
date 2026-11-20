@@ -73,7 +73,7 @@ export const AdminTopBar = ({
   return (
     <header className="admin-topbar hidden h-14 shrink-0 items-center gap-4 px-4 md:flex" data-admin-native>
       <Link to="/admin/painel" className="admin-topbar-brand" aria-label="Fornece Cloud — Início">
-        <img src="/logo-branco.png" alt="" />
+        <img src="/fornece-cloud.svg" alt="" />
         <span>Fornece Cloud</span>
       </Link>
 
