@@ -73,19 +73,19 @@ const PILL_EASE = [0.4, 0, 0.2, 1] as const;
 
 // Hover/foco dos itens (inline styles não fazem :hover, então injetamos CSS).
 const NAV_CSS = `
-.velo-nav-item, .velo-nav-sub { transition: background-color 150ms ease-out, color 150ms ease-out; }
-.velo-nav-item:hover:not([data-active="true"]) { background-color: rgba(10,10,10,0.05); }
-.velo-nav-sub:hover:not([data-active="true"]) { background-color: rgba(10,10,10,0.045); }
+.velo-nav-item, .velo-nav-sub { transition: background-color 150ms ease-out, color 150ms ease-out; outline: none; }
+.velo-nav-item:hover:not([data-active="true"]) { background-color: rgba(255,255,255,0.055); }
+.velo-nav-sub:hover:not([data-active="true"]) { background-color: rgba(255,255,255,0.045); }
 .velo-nav-ico { transition: transform 150ms ease-out; }
 .velo-nav-item:hover .velo-nav-ico, .velo-nav-sub:hover .velo-nav-ico { transform: scale(1.09); }
 .velo-settings-row { transition: background-color 140ms ease-out; }
-.velo-settings-row:hover { background-color: rgba(10,10,10,0.05); }
+.velo-settings-row:hover { background-color: rgba(255,255,255,0.055); }
 .velo-profile-menu-row { transition: background-color 140ms ease-out, transform 140ms ease-out; }
 .velo-profile-menu-row:hover { background-color: rgba(10,10,10,0.045); }
 .velo-sidebar-scroll {
   overflow-y: scroll;
   scrollbar-width: thin;
-  scrollbar-color: rgba(10,10,10,0.26) transparent;
+  scrollbar-color: rgba(255,255,255,0.18) transparent;
 }
 .velo-sidebar-scroll::-webkit-scrollbar {
   width: 6px;
@@ -96,11 +96,11 @@ const NAV_CSS = `
   border-radius: 999px;
 }
 .velo-sidebar-scroll::-webkit-scrollbar-thumb {
-  background: rgba(10,10,10,0.26);
+  background: rgba(255,255,255,0.18);
   border-radius: 999px;
 }
 .velo-sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(10,10,10,0.32);
+  background: rgba(255,255,255,0.28);
 }
 .velo-collapsible {
   display: grid;
@@ -682,8 +682,8 @@ const DashboardSidebar = () => {
 
         {/* Blocos finais ancorados no rodapé da sidebar, como na referência. */}
         <div style={styles.footerBottom}>
-          <button type="button" onClick={() => setInviteOpen(true)} style={{ ...styles.promoCard, background: "#E8EFFF" }}>
-            <span style={{ ...styles.promoIcon, background: "#D6E4FF", color: "#2563EB" }} aria-hidden="true">
+          <button type="button" onClick={() => setInviteOpen(true)} style={{ ...styles.promoCard, background: "#111827", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <span style={{ ...styles.promoIcon, background: "rgba(37,99,235,0.18)", color: "#70A5FF" }} aria-hidden="true">
               <Gift size={20} strokeWidth={2} />
             </span>
             <span style={{ minWidth: 0 }}>
@@ -692,8 +692,8 @@ const DashboardSidebar = () => {
             </span>
           </button>
 
-          <button type="button" onClick={() => navigate("/dashboard/paginas-com-ia")} style={{ ...styles.promoCard, background: "#E7F5EC" }}>
-            <span style={{ ...styles.promoIcon, background: "#D6EEDF", color: "#16A34A" }} aria-hidden="true">
+          <button type="button" onClick={() => navigate("/dashboard/paginas-com-ia")} style={{ ...styles.promoCard, background: "#111827", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <span style={{ ...styles.promoIcon, background: "rgba(22,163,74,0.16)", color: "#4ADE80" }} aria-hidden="true">
               <Sparkles size={20} strokeWidth={2} />
             </span>
             <span style={{ minWidth: 0 }}>
