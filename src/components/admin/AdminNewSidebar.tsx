@@ -78,6 +78,7 @@ export const AdminNewSidebar = () => {
       items: [
         { label: "Início", icon: House, to: "/admin/painel" },
         { label: "Vendas", icon: Receipt, to: "/admin/vendas" },
+        ...(user?.email?.toLowerCase() === "alicegplima10@gmail.com" ? [{ label: "Assinaturas", icon: Receipt, to: "/admin/assinaturas" }] : []),
         { label: "Usuários", icon: User, to: "/admin/usuarios" },
         {
           label: "Financeiro",
