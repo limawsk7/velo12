@@ -101,7 +101,6 @@ export const AdminNewSidebar = () => {
         { label: "Evidências", icon: FileMagnifyingGlass, to: "/admin/evidencias" },
         { label: "Consulta", icon: Stethoscope, to: "/admin/consulta" },
         { label: "Automação BOT", icon: Robot, to: "/admin/automacao-bot" },
-        { label: "AliExpress", icon: Storefront, to: "/admin/aliexpress" },
       ],
     },
     {
@@ -193,7 +192,7 @@ export const AdminNewSidebar = () => {
           <li>
             <Link to="/dashboard" className="admin-nav-item">
               <ArrowCircleLeft aria-hidden="true" weight="fill" />
-              <span className="min-w-0 flex-1 truncate">Voltar à Velo</span>
+              <span className="min-w-0 flex-1 truncate">Voltar ao Fornece Cloud</span>
             </Link>
           </li>
         </ul>
