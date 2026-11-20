@@ -130,6 +130,7 @@ const HelpCenterPage = lazy(() => import("./pages/HelpCenterPage"));
 const RefundSupportPage = lazy(() => import("./pages/RefundSupportPage"));
 const HelpCenterDashboardPage = lazy(() => import("./pages/dashboard/HelpCenterDashboardPage"));
 const ReferralAcceptPage = lazy(() => import("./pages/ReferralAcceptPage"));
+const AdminCaktoSubscriptionsPage = lazy(() => import("./pages/admin/AdminCaktoSubscriptionsPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -361,6 +362,7 @@ const App = () => (
               {/* Moldura do admin montada uma vez só; as abas trocam dentro dela. */}
               <Route element={<AdminRoute><AdminLayout /></AdminRoute>}>
                 <Route path="/admin/painel" element={<AdminPanelPage />} />
+                <Route path="/admin/assinaturas" element={<AdminCaktoSubscriptionsPage />} />
                 <Route path="/admin/usuarios" element={<AdminUsersPage />} />
                 <Route path="/admin/comissoes" element={<AdminCommissionsPage />} />
                 <Route path="/admin/suporte" element={<AdminSupportPage />} />
