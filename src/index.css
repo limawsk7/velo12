@@ -1614,3 +1614,38 @@ button[class*="bg-[#1"]:hover:not(:disabled) {
     animation: none !important;
   }
 }
+
+
+/* Fornece Cloud — surfaces escuras consistentes no painel sem alterar a lógica das páginas. */
+.dark .dashboard-inter {
+  background-color: #090B10;
+  color: #F3F4F6;
+}
+.dark .dashboard-inter [class~="bg-white"],
+.dark .dashboard-inter [class~="bg-gray-50"],
+.dark .dashboard-inter [class~="bg-slate-50"] {
+  background-color: #10151F !important;
+}
+.dark .dashboard-inter [class~="border-gray-100"],
+.dark .dashboard-inter [class~="border-gray-200"],
+.dark .dashboard-inter [class~="border-slate-100"],
+.dark .dashboard-inter [class~="border-slate-200"] {
+  border-color: rgba(255,255,255,0.09) !important;
+}
+.dark .dashboard-inter [class~="text-gray-900"],
+.dark .dashboard-inter [class~="text-slate-900"],
+.dark .dashboard-inter [class~="text-[#111827]"],
+.dark .dashboard-inter [class~="text-[#111113]"] {
+  color: #F3F4F6 !important;
+}
+.dark .dashboard-inter [class~="text-gray-600"],
+.dark .dashboard-inter [class~="text-gray-500"],
+.dark .dashboard-inter [class~="text-slate-600"],
+.dark .dashboard-inter [class~="text-slate-500"] {
+  color: #A1A1AA !important;
+}
+.dark .dashboard-inter input,
+.dark .dashboard-inter textarea,
+.dark .dashboard-inter select {
+  color-scheme: dark;
+}
