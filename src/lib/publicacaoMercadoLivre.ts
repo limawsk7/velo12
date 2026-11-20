@@ -442,30 +442,30 @@ export const gerarDescricaoComIa = async (dados: {
   titulo: string;
   categoria?: string | null;
   preco: number;
+  descricaoOriginal?: string | null;
 }): Promise<string> => {
   const preco = dados.preco.toFixed(2).replace(".", ",");
   const categoria = dados.categoria || "Não informada";
-  const prompt = `Você é um especialista em copywriting para e-commerce brasileiro.
-Gere uma descrição de produto persuasiva e completa para o Mercado Livre
-com base nestas informações:
+  const descricaoOriginal = (dados.descricaoOriginal ?? "").replace(/<[^>]*>/g, " ").replace(/\\s+/g, " ").trim().slice(0, 9000);
+  const prompt = `Você é especialista em copywriting para e-commerce brasileiro e criação de anúncios para o Mercado Livre.
 
-Nome: ${dados.titulo}
+Crie uma descrição clara, comercial e fiel ao produto. Use a descrição original do fornecedor como FONTE PRINCIPAL de informações.
+
+Nome do produto: ${dados.titulo}
 Categoria: ${categoria}
-Preço: R$ ${preco}
+Preço de venda: R$ ${preco}
 
-A descrição deve ter:
-- 4 a 6 parágrafos
-- Parágrafo 1: apresentação do produto e principal benefício
-- Parágrafo 2: características técnicas e diferenciais
-- Parágrafo 3: para quem é indicado e situações de uso
-- Parágrafo 4: garantia de qualidade e satisfação
-- Parágrafo 5: call-to-action persuasivo
-- Tom: confiante, vendedor e acessível
-- Idioma: português brasileiro
-- Não use bullet points, escreva em parágrafos corridos
-- Mínimo 300 palavras
+DESCRIÇÃO ORIGINAL DO FORNECEDOR:
+${descricaoOriginal || "O fornecedor não disponibilizou uma descrição. Use somente informações seguras que possam ser deduzidas do nome do produto, sem inventar especificações."}
 
-Retorne APENAS a descrição, sem introdução, sem comentários.`;
+REGRAS OBRIGATÓRIAS:
+- Preserve características, medidas, materiais, compatibilidade, conteúdo da embalagem e especificações que constarem na fonte.
+- Não invente números, potência, dimensões, certificações, garantias, acessórios, materiais ou benefícios que não estejam informados.
+- Corrija erros de português e remova HTML, repetições, links, dados de contato e propaganda do fornecedor.
+- Não diga que existe garantia se isso não estiver na fonte.
+- Escreva em português brasileiro, em 4 a 6 parágrafos curtos e objetivos.
+- Não inclua preço, emojis, títulos em caixa alta, listas com marcadores ou informações sobre o fornecedor.
+- Retorne somente a descrição final, sem introdução ou comentários.`;
 
   const { data, error } = await supabase.functions.invoke("chat", {
     body: { mode: "product_description", messages: [{ role: "user", content: prompt }] },
