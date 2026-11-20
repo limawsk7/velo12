@@ -35,7 +35,7 @@ export function isCreditImageFailure(error: unknown): boolean {
 async function requestDirectGemini(input: string, primary: boolean) {
   const key = Deno.env.get('GEMINI_API_KEY');
   if (!key) {
-    const error = new Error('Créditos Lovable esgotados e GEMINI_API_KEY não configurada') as Error & { status?: number; type?: string };
+    const error = new Error('GEMINI_API_KEY não configurada no ambiente do servidor') as Error & { status?: number; type?: string };
     error.status = 402;
     error.type = 'credit_limit_reached';
     throw error;
@@ -44,34 +44,61 @@ async function requestDirectGemini(input: string, primary: boolean) {
   const imagePart = data
     ? { inline_data: { mime_type: data[1], data: data[2] } }
     : { file_data: { mime_type: 'image/jpeg', file_uri: input } };
-  const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: imageVisionPrompt(primary) }] },
-      contents: [{ role: 'user', parts: [
-        { text: 'Esta imagem pode ser publicada como foto de produto? Responda em JSON.' },
-        imagePart,
-      ] }],
-      generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 1200 },
-    }),
-    signal: AbortSignal.timeout(30000),
+  const body = JSON.stringify({
+    systemInstruction: { parts: [{ text: imageVisionPrompt(primary) }] },
+    contents: [{ role: 'user', parts: [
+      { text: 'Esta imagem pode ser publicada como foto de produto? Responda em JSON.' },
+      imagePart,
+    ] }],
+    generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 1200 },
   });
-  if (!response.ok) {
-    const body = await response.text();
-    const error = new Error(`Gemini direto indisponível (HTTP ${response.status}): ${body.slice(0, 300)}`) as Error & { status?: number };
-    error.status = response.status;
-    throw error;
-  }
-  const result = await response.json() as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-    promptFeedback?: { blockReason?: string };
-  };
-  if (result.promptFeedback?.blockReason) throw new Error(`Recusa do Gemini direto: ${result.promptFeedback.blockReason}`);
-  const raw = result.candidates?.[0]?.content?.parts?.map(part => part.text ?? '').join('') || null;
-  return { raw, usage: undefined, id: undefined, provider: 'gemini_direct', creditCost: 0 };
-}
 
+  // Gemini 3.8 pode retornar 503 em picos de demanda. Tente novamente e
+  // alterne para o Flash-Lite, evitando que uma indisponibilidade isolada
+  // interrompa toda a publicação.
+  const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
+  let lastFailure = '';
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      let response: Response;
+      try {
+        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+          body,
+          signal: AbortSignal.timeout(30000),
+        });
+      } catch (err) {
+        lastFailure = err instanceof Error ? err.message : String(err);
+        if (attempt === 0) { await new Promise(resolve => setTimeout(resolve, 500)); continue; }
+        break;
+      }
+      if (response.ok) {
+        const result = await response.json() as {
+          candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+          promptFeedback?: { blockReason?: string };
+        };
+        if (result.promptFeedback?.blockReason) throw new Error(`Recusa do Gemini (${model}): ${result.promptFeedback.blockReason}`);
+        const raw = result.candidates?.[0]?.content?.parts?.map(part => part.text ?? '').join('') || null;
+        if (!raw) throw new Error(`Gemini (${model}) retornou resposta vazia`);
+        return { raw, usage: undefined, id: undefined, provider: model, creditCost: 0 };
+      }
+      const errorBody = await response.text();
+      lastFailure = `Gemini ${model} HTTP ${response.status}: ${errorBody.slice(0, 250)}`;
+      // Só repetir/trocar de modelo em falhas transitórias ou de capacidade.
+      if (![408, 429, 500, 502, 503, 504].includes(response.status)) {
+        const error = new Error(lastFailure) as Error & { status?: number };
+        error.status = response.status;
+        throw error;
+      }
+      if (attempt === 0) await new Promise(resolve => setTimeout(resolve, 700));
+      else break;
+    }
+  }
+  const error = new Error(`Conferência Gemini indisponível após modelos alternativos: ${lastFailure}`) as Error & { status?: number };
+  error.status = 503;
+  throw error;
+}
 export async function requestImageVision(input: string, runId?: string, primary = false, model: VisionModel = IMAGE_VISION_MODEL) {
   // In this deployment the Lovable gateway key is not configured. Prefer the
   // Gemini key already stored in Supabase Secrets, so photo checks do not
