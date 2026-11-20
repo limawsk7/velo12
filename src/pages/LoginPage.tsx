@@ -193,9 +193,8 @@ const LoginPage = () => {
     ""
   ).trim();
 
-  const [step, setStep]                   = useState<"initial" | "login" | "signup">(
-    entradaPeloCadastro ? "signup" : "initial",
-  );
+  // A área pública está temporariamente disponível apenas para login.
+  const [step, setStep]                   = useState<"initial" | "login" | "signup">("login");
   const [emailLocked, setEmailLocked]     = useState(false);
   const [email, setEmail]                 = useState(emailDaUrl);
   const [password, setPassword]           = useState("");
@@ -412,7 +411,7 @@ const LoginPage = () => {
     setLoading(false);
     if (error) { setAviso({ tipo: "erro", texto: error.message }); return; }
     setResetMode(false);
-    setStep("initial");
+    setStep("login");
     setAviso({ tipo: "ok", texto: "Link de recuperação enviado. Confira seu e-mail." });
   };
 
@@ -449,12 +448,11 @@ const LoginPage = () => {
     setEmailLocked(false);
     setPassword("");
     setNome("");
-    setStep("initial");
+    setStep("login");
   };
 
-  // Quem vem do botão principal da landing (?novo=1) já cai na criação de conta.
+  // Cadastro público desativado temporariamente: links antigos também abrem o login.
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("novo") === "1") setStep("signup");
     captureOrigin();
     trackSignup("signup_view");
     if (detectInAppBrowser()) trackSignup("signup_inapp_browser", detectInAppBrowser() ?? undefined);
@@ -485,8 +483,8 @@ const LoginPage = () => {
 
   const copy = getCopy(step, resetMode);
   // Cadastro alcançado pelo link, e não pela detecção de e-mail.
-  const cadastroDireto = step === "signup" && !emailLocked;
-  const mostraSocial = step === "initial" || cadastroDireto;
+  const cadastroDireto = false;
+  const mostraSocial = true;
   const inputCls =
     // 16px no celular: abaixo disso o Safari do iPhone dá zoom na página ao focar o campo.
     "h-[52px] w-full rounded-[10px] border border-[#E3E7EE] bg-white px-4 max-lg:h-12 max-lg:rounded-[14px] max-lg:pl-4 max-lg:text-[16px] text-[14px] font-medium text-[#0F172A] outline-none transition placeholder:font-normal placeholder:text-[#9AA4B2] focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10";
@@ -522,21 +520,6 @@ const LoginPage = () => {
         {/* Base: a foto se desfaz no fundo escuro atrás da folha. */}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,15,18,0)_45%,#0F0F12_100%)]" />
       </div>
-
-      {/* Atalho entre entrar e criar conta, como pílula no canto — só no celular. */}
-      <button
-        type="button"
-        onClick={() => {
-          if (resetMode) { setAviso(null); setResetMode(false); return; }
-          if (step === "signup") {
-            if (entradaPeloCadastro) navigate("/login");
-            else voltarParaInicio();
-          } else irParaCadastro();
-        }}
-        className="absolute right-4 top-5 z-10 h-9 rounded-full bg-white/25 px-4 text-[14px] font-semibold text-white backdrop-blur-md transition active:scale-[0.97] lg:hidden"
-      >
-        {step === "signup" && !resetMode ? "Entrar" : "Criar conta"}
-      </button>
 
       {/* ── Coluna do formulário ─────────────────────────────────────────── */}
       <div className="relative flex w-full flex-col px-3 pb-3 pt-12 sm:px-12 lg:px-16 lg:py-12 lg:w-1/2">
@@ -646,7 +629,7 @@ const LoginPage = () => {
                   className="inline-flex h-[52px] w-full items-center justify-center gap-2.5 rounded-[10px] border border-[#E3E7EE] bg-white text-[14px] font-semibold text-[#0F172A] transition hover:bg-[#F8FAFC] disabled:opacity-60 max-lg:h-12 max-lg:rounded-full max-lg:border-0 max-lg:bg-[#141414] max-lg:text-[15px] max-lg:text-white max-lg:active:scale-[0.99] max-lg:hover:bg-[#141414] lg:mt-7"
                 >
                   <GoogleIcon />
-                  {googleLoading ? "Conectando..." : cadastroDireto ? "Cadastrar com Google" : "Continuar com Google"}
+                  {googleLoading ? "Conectando..." : "Continuar com Google"}
                 </button>
 
                 {/* Navegador embutido de rede social: o Google não permite o login ali.
@@ -716,9 +699,7 @@ const LoginPage = () => {
                   onSubmit={(e) => {
                     e.preventDefault();
                     if (step === "initial") void handleEmailContinue();
-                    // No cadastro direto o e-mail fica fora do <form> do cadastro:
-                    // sem isto, dar Enter no campo não faria nada.
-                    else if (cadastroDireto) void handleSignUp(e);
+                    else if (step === "login") passwordRef.current?.focus();
                   }}
                   className="space-y-4"
                 >
@@ -889,48 +870,13 @@ const LoginPage = () => {
                   )}
                 </AnimatePresence>
 
-                <p className="pt-2 text-center text-[14px] text-[#64748B]">
-                  {step === "initial" && (
-                    <>
-                      Ainda não tem conta?{" "}
-                      <button
-                        type="button"
-                        onClick={irParaCadastro}
-                        className="font-semibold text-[#2563EB] transition hover:text-[#1D4ED8]"
-                      >
-                        Criar minha conta
-                      </button>
-                    </>
-                  )}
-
-                  {step === "login" && (
-                    <>
-                      Não é você?{" "}
-                      <button
-                        type="button"
-                        onClick={voltarParaInicio}
-                        className="font-semibold text-[#2563EB] transition hover:text-[#1D4ED8]"
-                      >
-                        Trocar e-mail
-                      </button>
-                    </>
-                  )}
-
-                  {step === "signup" && (
-                    <>
-                      Já tem uma conta?{" "}
-                      <button
-                        type="button"
-                        /* Veio de /cadastro: trocar só a etapa deixaria a pessoa numa
-                           tela de login com o endereço /cadastro na barra. */
-                        onClick={() => (entradaPeloCadastro ? navigate("/login") : voltarParaInicio())}
-                        className="font-semibold text-[#2563EB] transition hover:text-[#1D4ED8]"
-                      >
-                        Entrar
-                      </button>
-                    </>
-                  )}
-                </p>
+                {step === "login" && (
+                  <p className="pt-2 text-center text-[14px] text-[#64748B]">
+                    <button type="button" onClick={voltarParaInicio} className="font-semibold text-[#2563EB] transition hover:text-[#1D4ED8]">
+                      Trocar e-mail
+                    </button>
+                  </p>
+                )}
               </div>
             )}
             </motion.div>
