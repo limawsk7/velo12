@@ -48,7 +48,6 @@ const MAIS: Item[] = [
   { label: "Rastreio", icon: Activity, to: "/admin/rastreio" },
   { label: "Automação BOT", icon: Bot, to: "/admin/automacao-bot" },
   { label: "Central de ajuda", icon: LifeBuoy, to: "/admin/central-de-ajuda" },
-  { label: "AliExpress", icon: PackageSearch, to: "/admin/aliexpress" },
 ];
 
 /** Mesma chave da barra lateral: as duas leem do mesmo cache. */
@@ -196,7 +195,7 @@ export const AdminMobileNav = () => {
                   onClick={() => navigate("/dashboard")}
                   className="flex h-12 flex-1 items-center justify-center gap-2 rounded-[14px] border border-[#EEF0F3] text-[14px] font-medium text-[#1F2937] dark:border-[#303642] dark:text-[#DDE3EC]"
                 >
-                  <ArrowLeft size={17} /> Voltar à Velo
+                  <ArrowLeft size={17} /> Voltar ao Fornece Cloud
                 </button>
                 <button
                   type="button"
