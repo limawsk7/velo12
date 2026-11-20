@@ -326,7 +326,6 @@ export function LandingMobile({
   passos,
   faq,
   onCriarConta,
-  onEntrar,
   onEvento,
 }: Props) {
   const [faqAberta, setFaqAberta] = useState<number | null>(0);
