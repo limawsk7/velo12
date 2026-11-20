@@ -95,7 +95,7 @@ const ResetPasswordPage = () => {
           Redefinir senha
         </h1>
         <p className="mt-2 font-['Manrope'] text-[13px] leading-6 text-white/45">
-          Crie uma nova senha para acessar sua conta Velo.
+          Crie uma nova senha para acessar sua conta Fornece Cloud.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-3">
