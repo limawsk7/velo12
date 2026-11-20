@@ -300,11 +300,8 @@ const App = () => (
               <Route path="/velods/produto/editor" element={<Navigate to="/dashboard/paginas-com-ia" replace />} />
 
               <Route path="/catalogo" element={<StoreCatalogPage />} />
-              {/* Cadastro tem endereço próprio: o botão principal da landing é para
-                  quem ainda não tem conta, e cair na tela de login faz essa pessoa
-                  pensar que precisa de uma conta para poder criar uma conta.
-                  É a mesma LoginPage — ela abre direto no passo "criar conta". */}
-              <Route path="/cadastro" element={<LoginPage />} />
+              {/* Cadastro público temporariamente desativado. Links antigos levam ao login. */}
+              <Route path="/cadastro" element={<Navigate to="/login" replace />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/convite/:token" element={<ReferralAcceptPage />} />
               <Route path="/setup" element={<SetupPage />} />
