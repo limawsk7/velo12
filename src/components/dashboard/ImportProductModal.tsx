@@ -22,7 +22,6 @@ import {
 import {
   ErroDePublicacao,
   MULTIPLICADOR_SUGERIDO,
-  gerarDescricaoComIa,
   inferProductBrand,
   inferStickerAlbumName,
   isStickerAlbumProduct,
@@ -67,6 +66,21 @@ const ACCENT = "#2563EB";
 const formatBRL = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
+const limparDescricaoFornecedor = (value?: string | null) => (value ?? "")
+  .replace(/<script[\s\S]*?<\/script>/gi, " ")
+  .replace(/<style[\s\S]*?<\/style>/gi, " ")
+  .replace(/<\/(p|div|li|h[1-6]|br|tr)>/gi, "\n")
+  .replace(/<[^>]*>/g, " ")
+  .replace(/&nbsp;/gi, " ")
+  .replace(/&amp;/gi, "&")
+  .replace(/&lt;/gi, "<")
+  .replace(/&gt;/gi, ">")
+  .replace(/&quot;/gi, '"')
+  .replace(/&#39;|&apos;/gi, "'")
+  .replace(/[ \t]+/g, " ")
+  .replace(/\n\s*\n\s*\n/g, "\n\n")
+  .trim();
+
 const STEPS = [
   { num: 1, label: "Detalhes" },
   { num: 2, label: "Conexão" },
@@ -100,7 +114,6 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
   const flowOpenedAt = useRef(Date.now());
   const stepOpenedAt = useRef(Date.now());
   const previousStep = useRef(1);
-  const autoDescriptionAttempted = useRef(false);
   const restoredProductId = useRef<string | null>(null);
   // Estado do modal manual de categoria removido a pedido do usuário.
 
@@ -113,7 +126,6 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
 
   // AI description
   const [description, setDescription] = useState("");
-  const [generatingDesc, setGeneratingDesc] = useState(false);
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [albumName, setAlbumName] = useState("");
@@ -190,14 +202,13 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
     setPublishResult(null);
     setPublishing(false);
     setMlMissingCodes(null);
-    setDescription(draft?.description ?? "");
+    setDescription(draft?.description ?? limparDescricaoFornecedor(product.description));
     setTranslated(false);
     setBrand(draft?.brand ?? inferProductBrand(product, truncated));
     setModel(draft?.model ?? (product.model ?? "").trim());
     setAlbumName(draft?.albumName ?? inferStickerAlbumName(product, truncated));
     setSaleFormat(draft?.saleFormat ?? (product.title.toLowerCase().includes("kit") ? "kit" : "unit"));
     restoredProductId.current = product.id;
-    autoDescriptionAttempted.current = Boolean(draft?.description);
   }
 
   const costPrice = product?.cost_price ?? 0;
@@ -260,9 +271,7 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
     exigeAtributosDeAlbum: requiresStickerAttrs,
   });
 
-  // A descrição não é mais pré-preenchida com a descrição original do produto
-  // (que vinha com HTML cru do fornecedor). O usuário gera uma descrição limpa
-  // pelo botão "Gerar descrição com IA".
+  // Usa diretamente a descrição já salva no catálogo, vinda do fornecedor C7 Drop.
 
   const handleClose = () => {
     if (publishing) return;
@@ -327,33 +336,6 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
       setTranslating(false);
     }
   };
-
-  const handleGenerateDescription = async () => {
-    if (!product) return;
-    setGeneratingDesc(true);
-    const toastId = veloToast.loading("Gerando descrição com IA...");
-    try {
-      const texto = await gerarDescricaoComIa({
-        titulo: title,
-        categoria: product.category,
-        preco: sellPrice,
-        descricaoOriginal: product.description,
-      });
-      setDescription(texto);
-      veloToast.success("Descrição gerada", { id: toastId });
-    } catch (e) {
-      trackMobileHomeEvent(user?.id, "import_flow_error", { productId: product?.id, detail: "description_generation" });
-      veloToast.error(e instanceof Error ? e.message : "Erro ao gerar descrição", { id: toastId });
-    } finally {
-      setGeneratingDesc(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!open || step !== 3 || description.trim() || generatingDesc || autoDescriptionAttempted.current) return;
-    autoDescriptionAttempted.current = true;
-    void handleGenerateDescription();
-  }, [description, generatingDesc, open, step]);
 
   const trackError = (detail: string) => {
     trackMobileHomeEvent(user?.id, "import_flow_error", { productId: product?.id, detail });
@@ -567,7 +549,7 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
 
     if (!description.trim()) {
       trackError("review:description");
-      veloToast.error("Confira a descrição ou toque em Gerar novamente antes de continuar.");
+      veloToast.error("A descrição do fornecedor não está disponível para este produto.");
       return;
     }
 
@@ -886,7 +868,7 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
               <div key="s3" className="step-fade space-y-6 pb-6">
                 <div>
                   <h3 className="text-[14px] font-semibold text-[#0A0A0A]">Revisar anúncio</h3>
-                  <p className="text-[12.5px] text-gray-500 mt-1">Escolha onde publicar e finalize a descrição.</p>
+                  <p className="text-[12.5px] text-gray-500 mt-1">Confira a descrição original do fornecedor e finalize seu anúncio.</p>
                 </div>
 
                 {/* Platforms — hoje a publicação é só no Mercado Livre */}
@@ -965,27 +947,17 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
 
                 {/* Description */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-[12px] font-medium text-gray-600">Descrição do anúncio</label>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={handleGenerateDescription}
-                        disabled={generatingDesc}
-                        className="flex items-center gap-1.5 text-[11.5px] font-medium text-gray-500 hover:text-[#0A0A0A] transition-colors disabled:opacity-50"
-                      >
-                        {generatingDesc ? <Loader2 size={11} className="animate-spin" /> : <Sparkles size={11} />}
-                        {generatingDesc ? "Gerando" : "Gerar com IA"}
-                      </button>
-                    </div>
+                  <div className="mb-2">
+                    <label className="text-[12px] font-medium text-gray-600">Descrição original do fornecedor</label>
+                    <p className="mt-1 text-[11px] text-gray-400">Importada diretamente do cadastro do produto na C7 Drop. Você pode editar antes de publicar.</p>
                   </div>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder={generatingDesc ? "Preparando sua descrição…" : "Confira ou edite a descrição do anúncio"}
-                    rows={5}
-                    className="w-full resize-none rounded-xl border border-[#DCE7FA] bg-white px-4 py-3 text-[13px] text-[#0F172A] transition-colors placeholder:text-[#94A3B8] focus:border-[#2563EB] focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10"
+                    placeholder="Este produto não possui descrição cadastrada pelo fornecedor."
+                    rows={8}
+                    className="w-full resize-y rounded-xl border border-[#DCE7FA] bg-white px-4 py-3 text-[13px] text-[#0F172A] transition-colors placeholder:text-[#94A3B8] focus:border-[#2563EB] focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10"
                   />
-                  {generatingDesc && <p className="mt-2 flex items-center gap-2 text-[12px] text-[#64748B]"><Loader2 size={13} className="animate-spin text-[#2563EB]" /> A IA está preparando uma descrição para você conferir.</p>}
                 </div>
 
                 <div className="rounded-xl border border-[#DCE7FA] bg-[#F8FBFF] p-4">
@@ -1076,11 +1048,11 @@ const ImportProductModal = ({ open, onClose, product, mlAccountNeedsVerification
               {step === 3 && (
                 <PublishButton
                   onClick={() => void handleContinueFromReview()}
-                  loading={publishing || checkingSeller || generatingDesc}
+                  loading={publishing || checkingSeller}
                   loadingLabels={
                     publishing
                       ? ["Publicando…", "Criando anúncio…", "Finalizando…"]
-                      : generatingDesc
+                      : false
                         ? ["Preparando descrição…"]
                         : ["Verificando conta…"]
                   }
