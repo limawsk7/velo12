@@ -1,5 +1,5 @@
 import { Component, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import SupportFloatingWidget from "@/components/dashboard/SupportFloatingWidget";
+import SupportAssistantWidget from "@/components/dashboard/SupportAssistantWidget";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { veloToast } from "@/components/ui/velo-toast";
@@ -963,7 +963,7 @@ const DashboardLayoutInner = () => {
           </MobileDashboardChrome>
         </div>
         <NotificationBannerStack />
-        {showSupportWidget && !atlasAberto && <SupportFloatingWidget />}
+        {showSupportWidget && !atlasAberto && <SupportAssistantWidget />}
         <AnimatePresence>
           {showOnboarding && <OnboardingModal key="onboarding" onComplete={handleOnboardingComplete} onSkipToCatalog={handleSkipToCatalog} />}
         </AnimatePresence>
