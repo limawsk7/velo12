@@ -333,7 +333,7 @@ const MobileAccountPage = ({
   <section className="-mx-4 -mt-4 min-h-screen bg-white pb-8">
     <div className="bg-[#2563EB] px-5 pb-6 pt-6 text-white">
       <div className="mb-6">
-        <span className="text-[24px] font-bold tracking-[-0.04em]">Velo</span>
+        <span className="text-[24px] font-bold tracking-[-0.04em]">Fornece Cloud</span>
       </div>
       <Link to="/dashboard/configuracoes" className="flex min-w-0 items-center gap-4">
         <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white/80 bg-white text-[18px] font-bold text-[#2563EB] shadow-[0_8px_24px_rgba(30,58,138,0.24)]">
@@ -444,7 +444,7 @@ const MobileDashboardChrome = ({ children }: { children: ReactNode }) => {
   // azul em cima nem a barra de abas embaixo, que roubavam duas faixas da
   // conversa e deixavam dois cabeçalhos empilhados.
   const isAtlasRoute = location.pathname.startsWith("/dashboard/atlas");
-  const displayName = nome || user?.email || "Velo";
+  const displayName = nome || user?.email || "Fornece Cloud";
   const initials = displayName
     .split(/[\s._\-@]+/)
     .filter(Boolean)
@@ -545,7 +545,7 @@ const MobileDashboardChrome = ({ children }: { children: ReactNode }) => {
                 aria-label="Ir para o início"
               >
                 <img src="/icones/velo-cesta-branca.png" alt="" aria-hidden="true" className="h-7 w-7 shrink-0 object-contain" />
-                <span className="text-[19px] font-bold leading-none tracking-[-0.05em] text-white">Velo</span>
+                <span className="text-[19px] font-bold leading-none tracking-[-0.05em] text-white">Fornece Cloud</span>
               </button>
             ) : (
               <>
@@ -559,7 +559,7 @@ const MobileDashboardChrome = ({ children }: { children: ReactNode }) => {
                 </button>
                 <div className="min-w-0">
                   <p className="truncate text-[15px] font-semibold leading-5 tracking-[-0.02em] text-white">{routeMeta.title}</p>
-                  <p className="truncate text-[11px] font-medium text-white/70">Velo mobile</p>
+                  <p className="truncate text-[11px] font-medium text-white/70">Fornece Cloud mobile</p>
                 </div>
               </>
             )}
@@ -941,7 +941,7 @@ const DashboardLayoutInner = () => {
         ref={mobileShellRef}
         className="dashboard-inter flex h-svh max-h-svh min-h-0 w-full max-w-full overflow-hidden flex-col"
         style={{
-          background: isStartMode ? "#FFA640" : "linear-gradient(135deg, #F7F6F4 0%, #EFEDEA 48%, #E8E7E4 100%)",
+          background: isStartMode ? "#FFA640" : "linear-gradient(135deg, #090B10 0%, #0D1119 48%, #111827 100%)",
           transition: "background-color 280ms ease",
         }}
       >
@@ -1025,9 +1025,9 @@ const DashboardLayoutInner = () => {
               className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden p-5 sm:p-6 lg:p-7"
               style={{
                 background: isCatalogRoute || isHelpCenterRoute
-                  ? "#FFFFFF"
+                  ? "#090B10"
                   : isAiImagesRoute
-                    ? "#F4F4F6"
+                    ? "#10151F"
                     : "transparent",
               }}
             >
@@ -1047,7 +1047,7 @@ const DashboardLayoutInner = () => {
       </AnimatePresence>
       {!isMobile && <AtlasTour open={tourAberto} onClose={fecharTour} onAsk={perguntarAoAtlas} />}
       <NotificationBannerStack />
-      {showSupportWidget && !atlasAberto && <SupportFloatingWidget />}
+      {showSupportWidget && !atlasAberto && <SupportAssistantWidget />}
     </div>
   );
 };
