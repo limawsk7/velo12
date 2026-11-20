@@ -805,21 +805,6 @@ const DashboardSidebar = () => {
               </button>
 
 
-              {isAdmin ? (
-                <button
-                  className="velo-profile-menu-row"
-                  type="button"
-                  role="menuitem"
-                  onClick={() => handlePanelNavigate("/admin/painel")}
-                  style={styles.profileMenuRow}
-                >
-                  <span style={styles.profileMenuRowLeft}>
-                    <ShieldCheck size={15} strokeWidth={2} style={styles.profileMenuIcon} />
-                    <span style={styles.profileMenuLabel}>Painel Admin</span>
-                  </span>
-                </button>
-              ) : null}
-
               <div style={styles.profileMenuDivider} />
 
               <button
