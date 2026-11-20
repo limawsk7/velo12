@@ -24,8 +24,8 @@ const navItems = [
     label: "Recursos",
     target: "recursos",
     panel: [
-      { title: "Catálogo Velo", text: "Produtos de fornecedores brasileiros, com custo e margem à vista." },
-      { title: "Atlas", text: "A IA da Velo ajuda a avaliar produto, preço e próximo passo." },
+      { title: "Catálogo Fornece Cloud", text: "Produtos de fornecedores brasileiros, com custo e margem à vista." },
+      { title: "Atlas", text: "A IA da Fornece Cloud ajuda a avaliar produto, preço e próximo passo." },
       { title: "Produtos em alta", text: "Acompanhe o que está vendendo antes de investir no anúncio." },
       { title: "Páginas com IA", text: "Gere a página do produto a partir do item do catálogo." },
       { title: "Imagens com IA", text: "Crie variações de imagem para testar criativos." },
@@ -65,24 +65,24 @@ const supportItems = [
 
 const faqItems = [
   {
-    question: "Preciso ter estoque para usar a Velo?",
-    answer: "Não. A Velo foi pensada para operações de dropshipping, ajudando você a descobrir produtos e organizar a venda sem comprar estoque antes.",
+    question: "Preciso ter estoque para usar a Fornece Cloud?",
+    answer: "Não. A Fornece Cloud foi pensada para operações de dropshipping, ajudando você a descobrir produtos e organizar a venda sem comprar estoque antes.",
   },
   {
-    question: "A Velo publica produtos automaticamente?",
+    question: "A Fornece Cloud publica produtos automaticamente?",
     answer: "A plataforma ajuda a estruturar o catálogo e conectar canais. As ações disponíveis dependem das integrações e permissões da sua conta.",
   },
   {
     question: "Consigo vender no Mercado Livre?",
-    answer: "Sim. O Mercado Livre é o canal onde a Velo publica hoje: você conecta sua conta e o anúncio sai da plataforma com título, descrição e fotos já montados.",
+    answer: "Sim. O Mercado Livre é o canal onde a Fornece Cloud publica hoje: você conecta sua conta e o anúncio sai da plataforma com título, descrição e fotos já montados.",
   },
   {
     question: "A plataforma é para iniciantes?",
     answer: "Sim. A experiência prioriza clareza, próximos passos e decisões simples para quem está começando no ecommerce.",
   },
   {
-    question: "Quais dados a Velo usa para sugerir produtos?",
-    answer: "A Velo organiza sinais como categoria, preço, margem, fornecedor e contexto de mercado para ajudar você a avaliar oportunidades.",
+    question: "Quais dados a Fornece Cloud usa para sugerir produtos?",
+    answer: "A Fornece Cloud organiza sinais como categoria, preço, margem, fornecedor e contexto de mercado para ajudar você a avaliar oportunidades.",
   },
 ];
 
@@ -90,7 +90,7 @@ const faqItems = [
   Prova social do hero. Números informados pela operação em 17/11/2026:
   - lojistas: piso para o selo e a faixa. Se o banco (rpc_landing_stats) passar
     disso, vale o número do banco, arredondado para baixo em 50.
-  - vendas: soma do que os lojistas da Velo vendem por mês. Não é promessa de
+  - vendas: soma do que os lojistas da Fornece Cloud vendem por mês. Não é promessa de
     ganho para quem entra; atualize aqui quando o número mudar.
 */
 const LOJISTAS_ATIVOS_PISO = 1250;
@@ -103,7 +103,7 @@ const PASSOS_COMO_FUNCIONA = [
   },
   {
     titulo: "Publique no seu Mercado Livre",
-    texto: "Conecte sua conta e publique o anúncio direto pela Velo.",
+    texto: "Conecte sua conta e publique o anúncio direto pela Fornece Cloud.",
   },
   {
     titulo: "Venda e lucre",
@@ -139,7 +139,7 @@ const HERO_SLIDES = [
 
 /*
   PLACEHOLDER TEMPORÁRIO — some sozinho assim que qualquer foto de HERO_SLIDES carregar.
-  É um mockup com avatar gerado por IA, não um vendedor real usando a Velo.
+  É um mockup com avatar gerado por IA, não um vendedor real usando a Fornece Cloud.
 */
 const HERO_PLACEHOLDER = "/hero-pasted-image-2.webp";
 
@@ -182,12 +182,12 @@ const PROVA_VISUAL = [
   {
     src: "/barra%2001.webp",
     base: "barra-01",
-    alt: "Conversa com a IA da Velo recomendando produtos com preço e loja",
+    alt: "Conversa com a IA da Fornece Cloud recomendando produtos com preço e loja",
   },
   {
     src: "/barra%2002.webp",
     base: "barra-02",
-    alt: "Loja da Velo com produtos selecionados e marketplaces conectados",
+    alt: "Loja da Fornece Cloud com produtos selecionados e marketplaces conectados",
   },
 ];
 
@@ -402,15 +402,15 @@ function VeloLogo({ tone = "dark" }: { tone?: "dark" | "light" }) {
       <ImagemResponsiva
         base="logo"
         larguras={[96]}
-        original="/logo.png"
+        original="/fornece-cloud.svg"
         sizes="36px"
-        alt="Velo"
+        alt="Fornece Cloud"
         prioritaria
         width={36}
         height={36}
         className="block h-9 w-9 shrink-0 object-contain"
       />
-      <span className="text-[26px] font-bold leading-none tracking-[-0.06em]">Velo</span>
+      <span className="text-[26px] font-bold leading-none tracking-[-0.06em]">Fornece Cloud</span>
     </div>
   );
 }
@@ -719,7 +719,7 @@ export default function Index() {
         {/* Gutter lateral fixo (sem max-width centralizado) — o hero usa exatamente o mesmo. */}
         <div className="flex w-full items-center justify-between px-6 py-4 sm:px-10 lg:px-12">
           <div className="flex items-center gap-10">
-            <button type="button" onClick={() => navigate("/")} aria-label="Velo">
+            <button type="button" onClick={() => navigate("/")} aria-label="Fornece Cloud">
               {/* Celular: header escuro sobre a foto (claro só com o menu aberto). Desktop: hero claro. */}
               <span className="sm:hidden">
                 <VeloLogo tone={mobileNavOpen ? "dark" : "light"} />
@@ -1022,7 +1022,7 @@ export default function Index() {
           </h1>
 
           <p className="mt-5 max-w-[420px] text-[16px] leading-[1.55] tracking-[-0.01em] text-white/70 sm:mt-6 sm:text-[18px]">
-            A Velo encontra oportunidades de produto, ajuda a montar o anúncio e a publicar no Mercado Livre.
+            A Fornece Cloud encontra oportunidades de produto, ajuda a montar o anúncio e a publicar no Mercado Livre.
           </p>
 
           <div className="mt-8 flex flex-col gap-4 sm:mt-9 sm:flex-row sm:items-center sm:gap-3">
@@ -1058,7 +1058,7 @@ export default function Index() {
           className="group absolute bottom-10 right-8 hidden items-center gap-3 text-[14px] text-white/55 transition hover:text-white lg:flex"
         >
           <span className="h-px w-10 bg-white/35 transition group-hover:bg-white/80" />
-          Como a Velo escolhe os produtos
+          Como a Fornece Cloud escolhe os produtos
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M8 2.5v11M3.5 9.5 8 14l4.5-4.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" />
           </svg>
@@ -1096,7 +1096,7 @@ export default function Index() {
               width={2308}
               height={1440}
               sizes="(min-width: 1200px) 1200px, calc(100vw - 48px)"
-              alt="Tela de produto no catálogo da Velo: preço sugerido de R$ 44,00, margem de 100%, custo de R$ 22,00 ao fornecedor e lucro de R$ 22,00 por venda"
+              alt="Tela de produto no catálogo da Fornece Cloud: preço sugerido de R$ 44,00, margem de 100%, custo de R$ 22,00 ao fornecedor e lucro de R$ 22,00 por venda"
               className="block h-auto w-full"
             />
           </div>
@@ -1272,7 +1272,7 @@ export default function Index() {
             <button type="button" onClick={() => { registrarCliqueCadastro("cta_final_signup_click"); navigate(signupTarget); }} className="mt-8 h-[56px] w-full rounded-full bg-[#2563EB] text-[17px] font-semibold text-white sm:hidden">Criar minha conta</button>
 
             <p className="mt-5 hidden text-[14px] tracking-[-0.01em] text-[#8A97B1] sm:block">
-              Você concorda em receber e-mails de marketing da Velo.
+              Você concorda em receber e-mails de marketing da Fornece Cloud.
             </p>
           </div>
         </div>
@@ -1297,7 +1297,7 @@ export default function Index() {
                 <path d="M16.8 16.2L20 19.3L23.2 16.2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.45" />
               </svg>
             </div>
-            <span className="text-[22px] font-bold tracking-[-0.05em] text-[#0B1B3D]">Velo</span>
+            <span className="text-[22px] font-bold tracking-[-0.05em] text-[#0B1B3D]">Fornece Cloud</span>
           </div>
 
           <div className="flex flex-wrap gap-x-8 gap-y-3 text-[15px] text-[#5B6B8C] max-sm:gap-y-0">
