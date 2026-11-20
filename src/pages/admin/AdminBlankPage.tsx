@@ -853,6 +853,14 @@ const getValidaPayEventKey = (row: ValidaPayEventRow) =>
 const AdminPainelPage = () => {
   // atualização automática pausa quando o painel está numa aba escondida
   const polling5min = useAdminPolling(5 * 60_000);
+  const [isSimulation, setIsSimulation] = useState(() => {
+    try { return window.localStorage.getItem("fornece:admin-simulation") === "on"; } catch { return false; }
+  });
+  useEffect(() => {
+    const onSimulationChange = (event: Event) => setIsSimulation(Boolean((event as CustomEvent<boolean>).detail));
+    window.addEventListener("fornece:admin-simulation-change", onSimulationChange);
+    return () => window.removeEventListener("fornece:admin-simulation-change", onSimulationChange);
+  }, []);
   const [period, setPeriod] = useState<Period>(getStoredPeriod);
   const [customRange, setCustomRange] = useState<PeriodRange | null>(getStoredRange);
   const [groupingChoice, setGroupingChoice] = useState<Grouping | "auto">(() =>
@@ -1386,6 +1394,17 @@ const AdminPainelPage = () => {
       ? `Nenhum cancelamento ${periodPhrase}`
       : `${churnCount} cancelamento${churnCount === 1 ? "" : "s"} ${periodPhrase}`;
 
+  const simulationGross = 2350;
+  const simulationNet = 2115;
+  const simulationApproved = 31;
+  const simulationChurn = 0.02;
+  const simulationExits = 235;
+  const simulationSeries = useMemo(() => {
+    const length = Math.max(buckets.length, 2);
+    const weights = Array.from({ length }, (_, index) => 1 + Math.sin((index + 1) * 1.7) * 0.35 + (index / length) * 0.18);
+    const total = weights.reduce((sum, value) => sum + value, 0);
+    return weights.map((weight) => simulationNet * weight / total);
+  }, [buckets.length]);
   const tooltipLabels = buckets.map((key) => formatBucketLabel(key, grouping));
   const axisLabels = buckets.map((key) => formatAxisLabel(key, grouping));
 
@@ -1454,12 +1473,12 @@ const AdminPainelPage = () => {
         <div className="min-h-full md:hidden">
           <AdminMobileHome
             loading={hideFinancialValues}
-            approvedSales={finance.metrics.approved_sales}
-            grossRevenue={finance.metrics.gross_revenue}
-            costs={finance.metrics.costs}
-            churnRate={churnRate}
-            netRevenue={finance.metrics.net_revenue}
-            series={netSparklineValues}
+            approvedSales={isSimulation ? simulationApproved : finance.metrics.approved_sales}
+            grossRevenue={isSimulation ? simulationGross : finance.metrics.gross_revenue}
+            costs={isSimulation ? simulationExits : finance.metrics.costs}
+            churnRate={isSimulation ? simulationChurn : churnRate}
+            netRevenue={isSimulation ? simulationNet : finance.metrics.net_revenue}
+            series={isSimulation ? simulationSeries : netSparklineValues}
             comparison={previousNetSeries}
             labels={revenueSparklineLabels}
             grouping={grouping}
@@ -1478,10 +1497,15 @@ const AdminPainelPage = () => {
             transition={{ duration: reduceMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="px-6 pb-8 pt-6 lg:px-7">
+              {isSimulation ? <div className="mb-5 flex items-center gap-3 rounded-xl border border-violet-400/25 bg-violet-500/[0.07] px-4 py-3 text-[12px] text-violet-200">
+                <span className="h-2 w-2 rounded-full bg-violet-400 shadow-[0_0_12px_rgba(167,139,250,0.9)]" />
+                Modo de simulação ativo — números fictícios exibidos apenas neste painel; os dados reais permanecem intactos.
+              </div> : null}
               <header className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <ChartBarIcon aria-hidden="true" className="h-5 w-5 text-[color:var(--ov-text)]" />
                   <h1 className="text-[19px] font-medium tracking-[-0.02em] text-[color:var(--ov-text)]">Painel</h1>
+                  {isSimulation ? <span className="rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-violet-300">SIMULAÇÃO ATIVA</span> : null}
                   {panelRefreshing ? <span className="text-[12.5px] text-[color:var(--ov-text-4)]">Atualizando…</span> : null}
                   {isError && !isFetching ? (
                     <span className="ml-1 inline-flex items-center gap-2 text-[12.5px] text-[color:var(--ov-negative)]">
@@ -1530,18 +1554,18 @@ const AdminPainelPage = () => {
                 <OverviewStatCard
                   icon={BanknotesIcon}
                   label="Receita bruta"
-                  value={hideFinancialValues ? null : finance.metrics.gross_revenue}
+                  value={isSimulation ? simulationGross : hideFinancialValues ? null : finance.metrics.gross_revenue}
                   format="currency"
-                  delta={revenueDelta}
+                  delta={isSimulation ? null : revenueDelta}
                   comparedTo={comparedTo}
-                  loading={financialDataLoading}
+                  loading={isSimulation ? false : financialDataLoading}
                 />
                 <OverviewStatCard
                   icon={ShoppingBagIcon}
                   label="Vendas aprovadas"
-                  value={hideFinancialValues ? null : finance.metrics.approved_sales}
+                  value={isSimulation ? simulationApproved : hideFinancialValues ? null : finance.metrics.approved_sales}
                   format="integer"
-                  delta={salesDelta}
+                  delta={isSimulation ? null : salesDelta}
                   unit={{ singular: "venda", plural: "vendas" }}
                   comparedTo={comparedTo}
                   loading={financialDataLoading}
@@ -1549,18 +1573,18 @@ const AdminPainelPage = () => {
                 <OverviewStatCard
                   icon={UserMinusIcon}
                   label="Churn"
-                  value={hideFinancialValues ? null : churnRate}
+                  value={isSimulation ? simulationChurn : hideFinancialValues ? null : churnRate}
                   format="percent"
-                  note={churnNote}
+                  note={isSimulation ? "Cancelamentos simulados" : churnNote}
                   comparedTo={comparedTo}
                   loading={financialDataLoading}
                 />
                 <OverviewStatCard
                   icon={ReceiptRefundIcon}
                   label="Saídas"
-                  value={hideFinancialValues ? null : finance.metrics.costs}
+                  value={isSimulation ? simulationExits : hideFinancialValues ? null : finance.metrics.costs}
                   format="currency"
-                  delta={refundsDelta}
+                  delta={isSimulation ? null : refundsDelta}
                   invertDelta
                   comparedTo={comparedTo}
                   loading={financialDataLoading}
@@ -1570,10 +1594,10 @@ const AdminPainelPage = () => {
               <section className="mt-4">
                 <OverviewRevenueCard
                   label="Receita líquida"
-                  value={hideFinancialValues ? null : finance.metrics.net_revenue}
-                  delta={netDelta}
+                  value={isSimulation ? simulationNet : hideFinancialValues ? null : finance.metrics.net_revenue}
+                  delta={isSimulation ? null : netDelta}
                   comparedTo={comparedTo}
-                  values={netSparklineValues}
+                  values={isSimulation ? simulationSeries : netSparklineValues}
                   tooltipLabels={tooltipLabels}
                   axisLabels={axisLabels}
                   seriesName="Receita líquida"
