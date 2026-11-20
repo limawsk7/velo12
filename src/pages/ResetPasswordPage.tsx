@@ -77,6 +77,19 @@ const ResetPasswordPage = () => {
       return;
     }
 
+    const isCaktoActivation = (() => {
+      try { return window.sessionStorage.getItem("cakto_activation_flow") === "1"; } catch { return false; }
+    })();
+    if (isCaktoActivation) {
+      const { error: activationError } = await supabase.functions.invoke("cakto-activation", {
+        body: { action: "finish" },
+      });
+      if (activationError) {
+        console.warn("[cakto] senha atualizada, mas não foi possível registrar a ativação.", activationError);
+      }
+      try { window.sessionStorage.removeItem("cakto_activation_flow"); } catch { /* storage indisponível */ }
+    }
+
     veloToast.success("Senha atualizada com sucesso.", { id: toastId });
     await supabase.auth.signOut();
     navigate("/login", { replace: true });
