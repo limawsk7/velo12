@@ -15,7 +15,6 @@ import {
   Robot,
   Sparkle,
   Stethoscope,
-  Storefront,
   Tray,
   User,
 } from "@phosphor-icons/react";
