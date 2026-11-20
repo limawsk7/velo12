@@ -9,6 +9,7 @@ import type { QueryClient } from "@tanstack/react-query";
  */
 export const adminPageLoaders = {
   "/admin/painel": () => import("./AdminPanelPage"),
+  "/admin/simulador": () => import("./AdminSimulatorPage"),
   "/admin/usuarios": () => import("./AdminUsersRoutePage"),
   "/admin/comissoes": () => import("./AdminCommissionsRoutePage"),
   "/admin/suporte": () => import("./AdminSupportPage"),
@@ -39,6 +40,7 @@ const adminDataModules: Partial<Record<AdminPath, () => Promise<DataModule>>> = 
 /** Ordem do pré-carregamento: as abas mais usadas primeiro. */
 const PRELOAD_ORDER: AdminPath[] = [
   "/admin/painel",
+  "/admin/simulador",
   "/admin/vendas",
   "/admin/usuarios",
   "/admin/suporte",
