@@ -397,15 +397,9 @@ function SecaoProvaVisual() {
 function VeloLogo({ tone = "dark" }: { tone?: "dark" | "light" }) {
   return (
     <div className={`flex items-center gap-2.5 transition-colors duration-200 ${tone === "light" ? "text-white" : "text-[#0B1B3D]"}`}>
-      {/* 36x36 na tela: o PNG de 146 KB era desperdício puro. O WebP de 96px
-          cobre retina com 2 KB. */}
-      <ImagemResponsiva
-        base="logo"
-        larguras={[96]}
-        original="/fornece-cloud.svg"
-        sizes="36px"
+      <img
+        src="/fornece-cloud.svg"
         alt="Fornece Cloud"
-        prioritaria
         width={36}
         height={36}
         className="block h-9 w-9 shrink-0 object-contain"
