@@ -575,15 +575,36 @@ const buildBuckets = (range: PeriodRange, grouping: Grouping) => {
   return buckets;
 };
 
-const fetchAllSubscriptions = () =>
-  fetchAllPages<SubscriptionRow>((from, to) =>
-    supabase
-      .from("subscriptions")
-      .select("id,user_id,plan,amount,status,payment_method,mp_payment_id,provider,validapay_charge_id,validapay_subscription_id,charge_attempts,last_charge_attempt_at,current_period_start,current_period_end,next_charge_at,created_at,updated_at")
-      .order("updated_at", { ascending: false })
-      .order("id")
-      .range(from, to),
-  );
+const fetchAllSubscriptions = async (): Promise<SubscriptionRow[]> => {
+  // O checkout atual da Fornece Cloud registra compras em payment_orders (Cakto).
+  // Não consultar a tabela antiga de assinaturas ValidaPay, que não é usada neste produto.
+  const { data, error } = await supabase
+    .from("payment_orders" as never)
+    .select("id,auth_user_id,plan,amount_cents,status,payment_method,provider,provider_payment_id,paid_at,expires_at,created_at" as never)
+    .eq("provider" as never, "cakto" as never)
+    .order("created_at" as never, { ascending: false })
+    .limit(2000);
+  if (error) throw error;
+  return ((data ?? []) as unknown as Array<Record<string, unknown>>).map((order) => ({
+    id: String(order.id),
+    user_id: order.auth_user_id ? String(order.auth_user_id) : null,
+    plan: String(order.plan ?? "base"),
+    amount: Number(order.amount_cents ?? 0) / 100,
+    status: String(order.status ?? "pending"),
+    payment_method: order.payment_method ? String(order.payment_method) : null,
+    mp_payment_id: order.provider_payment_id ? String(order.provider_payment_id) : null,
+    provider: "cakto",
+    validapay_charge_id: null,
+    validapay_subscription_id: null,
+    charge_attempts: 0,
+    last_charge_attempt_at: null,
+    current_period_start: order.paid_at ? String(order.paid_at) : null,
+    current_period_end: order.expires_at ? String(order.expires_at) : null,
+    next_charge_at: null,
+    created_at: String(order.created_at),
+    updated_at: String(order.created_at),
+  })) as SubscriptionRow[];
+};
 
 const fetchAllValidaPayEvents = async () => {
   try {
