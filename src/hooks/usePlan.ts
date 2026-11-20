@@ -110,10 +110,16 @@ export const usePlan = (): PlanState => {
       });
     };
 
-    fetchPlan();
+    void fetchPlan();
+    // Revalida o plano durante sessões abertas e sempre que a pessoa volta à aba.
+    const intervalId = window.setInterval(() => void fetchPlan(), 5 * 60 * 1000);
+    const handleFocus = () => void fetchPlan();
+    window.addEventListener("focus", handleFocus);
 
     return () => {
       cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
     };
   }, [user, authLoading]);
 
