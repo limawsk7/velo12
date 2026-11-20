@@ -1472,7 +1472,7 @@ const AdminPainelPage = () => {
       >
         <div className="min-h-full md:hidden">
           <AdminMobileHome
-            loading={hideFinancialValues}
+            loading={isSimulation ? false : hideFinancialValues}
             approvedSales={isSimulation ? simulationApproved : finance.metrics.approved_sales}
             grossRevenue={isSimulation ? simulationGross : finance.metrics.gross_revenue}
             costs={isSimulation ? simulationExits : finance.metrics.costs}
