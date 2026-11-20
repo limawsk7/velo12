@@ -149,12 +149,12 @@ const getCopy = (step: "initial" | "login" | "signup", resetMode: boolean) => {
   if (resetMode) {
     return {
       title: "Recupere seu acesso",
-      subtitle: "Enviaremos um link para você redefinir a senha e voltar para a Velo.",
+      subtitle: "Enviaremos um link para você redefinir a senha e voltar para a Fornece Cloud.",
     };
   }
   if (step === "signup") {
     return {
-      title: "Crie sua conta Velo",
+      title: "Crie sua conta Fornece Cloud",
       subtitle: "Leva menos de um minuto para começar a vender sem estoque.",
     };
   }
@@ -165,7 +165,7 @@ const getCopy = (step: "initial" | "login" | "signup", resetMode: boolean) => {
     };
   }
   return {
-    title: "Crie sua conta Velo",
+    title: "Crie sua conta Fornece Cloud",
     subtitle: "Digite seu e-mail para começar. Se você já tem conta, a gente te leva direto para entrar.",
   };
 };
@@ -179,7 +179,7 @@ const LoginPage = () => {
   /*
     Quem chega por /cadastro (ou por ?modo=cadastro) veio do botão principal da
     landing, que é dirigido a quem ainda NÃO tem conta. Abrir na etapa de e-mail,
-    sob o título "Entre na Velo", é pedir login a quem nunca se cadastrou — e era
+    sob o título "Entre na Fornece Cloud", é pedir login a quem nunca se cadastrou — e era
     aí que essa pessoa desistia. O e-mail fica destravado: ninguém o digitou ainda.
   */
   const location = useLocation();
@@ -345,7 +345,7 @@ const LoginPage = () => {
       trackSignup("signup_error", tipoDeErro(error.message));
       if (/already registered/i.test(error.message)) {
         setStep("login");
-        setAviso({ tipo: "info", texto: "Este e-mail já tem conta na Velo. Entre com a sua senha." });
+        setAviso({ tipo: "info", texto: "Este e-mail já tem conta na Fornece Cloud. Entre com a sua senha." });
         window.setTimeout(() => passwordRef.current?.focus(), 120);
         return;
       }
@@ -381,7 +381,7 @@ const LoginPage = () => {
       // Marca o onboarding como pendente para este usuário: garante que o modal
       // de cadastro apareça no primeiro acesso ao dashboard (frontend-only).
       markOnboardingPending(data.user.id);
-      // A Velo não usa confirmação de e-mail: a conta já entra direto.
+      // A Fornece Cloud não usa confirmação de e-mail: a conta já entra direto.
       if (data.session) {
         navigate(destinoPosLogin(), { replace: true });
         return;
@@ -554,11 +554,11 @@ const LoginPage = () => {
             transition={{ duration: 0.5, ease }}
             className="absolute left-5 top-5 z-10 w-fit lg:left-16 lg:top-12"
           >
-            <Link to="/" className="inline-flex w-fit items-center gap-2.5" aria-label="Voltar para a home da Velo">
-              <img src="/logo.png" alt="Velo" className="h-8 w-8 rounded-[10px] lg:h-11 lg:w-11 lg:rounded-[13px]" />
+            <Link to="/" className="inline-flex w-fit items-center gap-2.5" aria-label="Voltar para a home da Fornece Cloud">
+              <img src="/fornece-cloud.svg" alt="Fornece Cloud" className="h-8 w-8 rounded-[10px] lg:h-11 lg:w-11 lg:rounded-[13px]" />
               {/* Mesma métrica do logotipo da landing. No desktop só o ícone, como sempre foi. */}
               <span className="text-[22px] font-bold leading-none tracking-[-0.06em] text-white [font-family:'Inter_Variable',Inter,ui-sans-serif,system-ui,sans-serif] lg:hidden">
-                Velo
+                Fornece Cloud
               </span>
             </Link>
           </motion.div>
@@ -654,7 +654,7 @@ const LoginPage = () => {
                 {avisoNavegador && (
                   <div className="mt-3 rounded-[12px] border border-[#FDE3C0] bg-[#FFF8EE] px-3.5 py-3 text-[13px] leading-[1.55] text-[#92400E]">
                     <p>
-                      O {navegadorInterno ?? "aplicativo"} abre a Velo numa janela própria, e o Google não
+                      O {navegadorInterno ?? "aplicativo"} abre a Fornece Cloud numa janela própria, e o Google não
                       permite login por aqui. Toque nos três pontinhos e escolha
                       <strong> “Abrir no navegador”</strong> — ou continue com seu e-mail logo abaixo.
                     </p>
@@ -671,7 +671,7 @@ const LoginPage = () => {
                       }}
                       className="mt-2 inline-flex h-9 items-center rounded-full bg-[#92400E] px-4 text-[13px] font-semibold text-white"
                     >
-                      {linkCopiado ? "Link copiado!" : "Copiar link da Velo"}
+                      {linkCopiado ? "Link copiado!" : "Copiar link da Fornece Cloud"}
                     </button>
                   </div>
                 )}
@@ -844,7 +844,7 @@ const LoginPage = () => {
                         </div>
 
                         {/* Regras conferidas antes do envio. O Auth exige 6+ caracteres e
-                            bloqueia senhas vazadas; a Velo pede 8+. Não há exigência de
+                            bloqueia senhas vazadas; a Fornece Cloud pede 8+. Não há exigência de
                             letras, números ou símbolos. */}
                         <div className="-mt-1 space-y-1 text-[13px]">
                           <p className={`flex items-center gap-1.5 ${password.length >= 8 ? "text-[#16A34A]" : "text-[#64748B]"}`}>
