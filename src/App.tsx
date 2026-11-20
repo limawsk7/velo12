@@ -106,6 +106,7 @@ const ProductsPage = lazy(() => import("./pages/dashboard/ProductsPage"));
 const PagamentosPage = lazy(() => import("./pages/dashboard/PagamentosPage"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const CaktoActivationPage = lazy(() => import("./pages/CaktoActivationPage"));
 const CriarVideoPage = lazy(() => import("./pages/dashboard/CriarVideoPage"));
 const ChatFornecedoresPage = lazy(() => import("./pages/dashboard/ChatFornecedoresPage"));
 const DocumentacaoComunidadePage = lazy(() => import("./pages/dashboard/DocumentacaoComunidadePage"));
@@ -304,6 +305,7 @@ const App = () => (
               {/* Cadastro público temporariamente desativado. Links antigos levam ao login. */}
               <Route path="/cadastro" element={<Navigate to="/login" replace />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/ativar" element={<CaktoActivationPage />} />
               <Route path="/convite/:token" element={<ReferralAcceptPage />} />
               <Route path="/setup" element={<SetupPage />} />
               {/* Endereço antigo da Comunidade e Ajuda. Mantido como redirecionamento
