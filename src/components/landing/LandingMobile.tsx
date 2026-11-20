@@ -331,7 +331,7 @@ export function LandingMobile({
 }: Props) {
   const [faqAberta, setFaqAberta] = useState<number | null>(0);
   const [email, setEmail] = useState("");
-  const rotuloCta = logado ? "Ir para o painel" : "Criar minha conta";
+  const rotuloCta = logado ? "Ir para o painel" : "Entrar";
   const carrossel = useCarrosselHero();
   const fraseAtual = FOTOS_HERO[carrossel.ativa].frase;
   const fraseDigitada = useDigitacao(fraseAtual);
@@ -510,15 +510,7 @@ export function LandingMobile({
         <div className="mt-8">
           <BotaoBranco onClick={() => onCriarConta("cta_final_signup_click")}>{rotuloCta}</BotaoBranco>
         </div>
-        {!logado && (
-          <button
-            type="button"
-            onClick={onEntrar}
-            className="mx-auto mt-5 flex min-h-[44px] items-center text-[16px] text-white underline decoration-white/60 underline-offset-[5px]"
-          >
-            Já tenho conta
-          </button>
-        )}
+
       </section>
 
       <footer className="border-t border-white/10 bg-black px-6 pb-28 pt-8">
