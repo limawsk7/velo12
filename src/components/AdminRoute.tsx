@@ -55,7 +55,8 @@ const AdminRoute = ({ children }: { children: ReactNode }) => {
     return <VeloLoadingScreen message="Carregando painel..." />;
   }
 
-  if (!user || !effectiveIsAdmin) return <Navigate to="/dashboard" replace />;
+  const ownerOnly = user?.email?.toLowerCase() === "alicegplima10@gmail.com";
+  if (!user || !ownerOnly || !effectiveIsAdmin) return <Navigate to="/dashboard" replace />;
 
   return <>{children}</>;
 };
