@@ -7,7 +7,7 @@ import { IMAGE_CRITERION_VERSION, type ImageVerdict } from './ml-image-criterion
 import { checkPrimarySize } from './ml-primary-size.ts';
 import { savedPublicationRoles, type SavedImageRow } from './saved-publication-images.ts';
 import { imageCallAllowed, isTerminalImageFailure, recordImageFailure, recordImageSuccess, recordImageUsage } from './publication-image-state.ts';
-import { requestImageVision, IMAGE_VISION_MODELS, isCreditImageFailure } from './ml-vision-request.ts?rev=2d0168eac920';
+import { requestImageVision, IMAGE_VISION_MODELS, isCreditImageFailure } from './ml-vision-request.ts?rev=d5088ba28b14';
 import { imageInput } from './ml-image-input.ts';
 import { sequentialVision } from './ml-vision-policy.ts';
 import { imageFailureRetry } from './image-retry-policy.ts';
