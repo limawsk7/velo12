@@ -6,7 +6,7 @@ export const SUPPORT_PAGES = [
   ...ATLAS_NAV_ITEMS.filter((item) => PUBLIC_IDS.has(item.id)).map((item) => item.id === "integracoes"
     ? { ...item, route: "/dashboard/configuracoes?tab=Integra%C3%A7%C3%B5es", description: "Configurações → Integrações, para conectar o Mercado Livre." }
     : item),
-  { id: "suporte", label: "Configurações → Suporte", route: "/dashboard/configuracoes?tab=Suporte", description: "Chamados e atendimento da Velo.", aliases: ["suporte", "chamado", "chamados", "atendimento"] },
+  { id: "suporte", label: "Configurações → Suporte", route: "/dashboard/configuracoes?tab=Suporte", description: "Chamados e atendimento da Fornece Cloud.", aliases: ["suporte", "chamado", "chamados", "atendimento"] },
   { id: "perfil", label: "Configurações → Perfil", route: "/dashboard/configuracoes?tab=Perfil", description: "Dados pessoais e alteração de e-mail.", aliases: ["perfil", "email", "e-mail"] },
   { id: "seguranca", label: "Configurações → Segurança", route: "/dashboard/configuracoes?tab=Seguran%C3%A7a", description: "Segurança da conta e senha.", aliases: ["seguranca", "segurança", "senha"] },
 ];
@@ -33,7 +33,7 @@ export function supportNavigationReply(message: string): string | null {
   return `Você encontra em [${match.page.label}](${match.page.route}).`;
 }
 
-export const SUPPORT_NAVIGATION_PROMPT = `Páginas reais da Velo (use links markdown relativos, que abrem na própria Velo):
+export const SUPPORT_NAVIGATION_PROMPT = `Páginas reais da Fornece Cloud (use links markdown relativos, que abrem na própria Fornece Cloud):
 ${SUPPORT_PAGES.map((page) => `- ${page.label}: ${page.route}. ${page.description}`).join("\n")}
 Cancelar a renovação e reembolso: não indique página nenhuma nem menu (não existe botão para isso nas Configurações); o link é enviado pelo sistema quando a pessoa pede para cancelar ou pedir reembolso. Nunca mande link ou endereço da Central de Ajuda (/ajuda) nem da página de cancelamento.
 Perguntas apenas sobre onde fica uma página: responda diretamente com o link, sem verificar a conta do Mercado Livre, buscar artigos ou encaminhar a uma pessoa (pode consultar o artigo onde-fica-cada-pagina, sem mandar o link dele). Se o cliente disser que não encontrou, peça um print da tela e só então encaminhe para o suporte humano. No computador, Catálogo e Páginas com IA ficam no grupo Produtos. No celular o menu pode estar recolhido. Não invente botões, menus nem funções. A página de influencers se chama Avatares, nunca TikTok. Para conectar o Mercado Livre, use Configurações → Integrações. Abrir um formulário não confirma nenhuma ação.`;
