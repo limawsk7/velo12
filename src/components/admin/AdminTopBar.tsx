@@ -72,9 +72,9 @@ export const AdminTopBar = ({
 
   return (
     <header className="admin-topbar hidden h-14 shrink-0 items-center gap-4 px-4 md:flex" data-admin-native>
-      <Link to="/admin/painel" className="admin-topbar-brand" aria-label="Velo Admin — Início">
+      <Link to="/admin/painel" className="admin-topbar-brand" aria-label="Fornece Cloud — Início">
         <img src="/logo-branco.png" alt="" />
-        <span>Velo Admin</span>
+        <span>Fornece Cloud</span>
       </Link>
 
       <div className="flex min-w-0 flex-1 justify-center">
@@ -108,7 +108,7 @@ export const AdminTopBar = ({
             aria-haspopup="menu"
             className="admin-topbar-account"
           >
-            <span className="max-w-[160px] truncate">Velo Admin</span>
+            <span className="max-w-[160px] truncate">Fornece Cloud</span>
             <span className="admin-topbar-avatar" aria-hidden="true">
               {initialsOf(profileName)}
             </span>
@@ -130,7 +130,7 @@ export const AdminTopBar = ({
                 }}
               >
                 <ArrowCircleLeft aria-hidden="true" weight="fill" />
-                Voltar à Velo
+                Voltar ao Fornece Cloud
               </button>
               <button type="button" role="menuitem" className="admin-account-menu-item" onClick={() => void handleSignOut()}>
                 <SignOut aria-hidden="true" weight="fill" />
