@@ -242,7 +242,7 @@ const MobileDrawerLink = ({
   <Link
     to={to}
     onClick={onClick}
-    className="flex min-h-14 items-center gap-4 border-b border-black/[0.06] px-1 text-[15px] font-semibold text-[#111111] transition active:bg-black/[0.03]"
+    className="flex min-h-14 items-center gap-4 border-b border-white/[0.08] px-1 text-[15px] font-semibold text-[#111111] transition active:bg-black/[0.03]"
   >
     <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#111111]">
       <Icon size={22} strokeWidth={1.7} />
@@ -264,7 +264,7 @@ const MobileDrawerButton = ({
   <button
     type="button"
     onClick={onClick}
-    className="flex min-h-14 w-full items-center gap-4 border-b border-black/[0.06] px-1 text-left text-[15px] font-semibold text-[#111111] transition active:bg-black/[0.03]"
+    className="flex min-h-14 w-full items-center gap-4 border-b border-white/[0.08] px-1 text-left text-[15px] font-semibold text-[#111111] transition active:bg-black/[0.03]"
   >
     <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#111111]">
       <Icon size={22} strokeWidth={1.7} />
@@ -330,20 +330,20 @@ const MobileAccountPage = ({
   };
 
   return (
-  <section className="-mx-4 -mt-4 min-h-screen bg-white pb-8">
+  <section className="-mx-4 -mt-4 min-h-screen bg-[#101318] pb-8">
     <div className="bg-[#2563EB] px-5 pb-6 pt-6 text-white">
       <div className="mb-6">
         <span className="text-[24px] font-bold tracking-[-0.04em]">Fornece Cloud</span>
       </div>
       <Link to="/dashboard/configuracoes" className="flex min-w-0 items-center gap-4">
-        <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white/80 bg-white text-[18px] font-bold text-[#2563EB] shadow-[0_8px_24px_rgba(30,58,138,0.24)]">
+        <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white/80 bg-[#101318] text-[18px] font-bold text-[#2563EB] shadow-[0_8px_24px_rgba(30,58,138,0.24)]">
           {foto ? <img src={foto} alt="Avatar" className="h-full w-full object-cover" /> : initials}
         </span>
         <div className="min-w-0">
           <div className="flex min-w-0 items-center gap-2">
             <p className="truncate text-[21px] font-bold tracking-[-0.03em]">{displayName}</p>
             {!planLoading && (
-              <span className="shrink-0 rounded-full border border-white/30 bg-white/15 px-2 py-1 text-[9px] font-black uppercase leading-none text-white">
+              <span className="shrink-0 rounded-full border border-white/30 bg-[#101318]/15 px-2 py-1 text-[9px] font-black uppercase leading-none text-white">
                 {planLabel}
               </span>
             )}
@@ -352,12 +352,12 @@ const MobileAccountPage = ({
         </div>
       </Link>
       {planLoading ? (
-        <div className="mt-6 h-14 animate-pulse rounded-2xl bg-white/70" />
+        <div className="mt-6 h-14 animate-pulse rounded-2xl bg-[#101318]/70" />
       ) : (
         <button
           type="button"
           onClick={() => upgradeModal.open({ origin: "minha_conta" })}
-          className="mt-6 flex min-h-14 w-full items-center justify-between gap-3 rounded-2xl bg-white px-4 py-2.5 text-left text-[#1E3A8A] shadow-[0_10px_25px_rgba(30,58,138,0.18)]"
+          className="mt-6 flex min-h-14 w-full items-center justify-between gap-3 rounded-2xl bg-[#101318] px-4 py-2.5 text-left text-blue-300 shadow-[0_10px_25px_rgba(30,58,138,0.18)]"
         >
           <div className="min-w-0">
             <p className="text-[13px] font-bold">
@@ -398,7 +398,7 @@ const MobileAccountPage = ({
         <button
           type="button"
           onClick={handleSignOut}
-          className="flex min-h-14 w-full items-center gap-4 border-b border-black/[0.06] px-1 text-left text-[15px] font-semibold text-[#DC2626] transition active:bg-[#DC2626]/[0.06]"
+          className="flex min-h-14 w-full items-center gap-4 border-b border-white/[0.08] px-1 text-left text-[15px] font-semibold text-[#DC2626] transition active:bg-[#DC2626]/[0.06]"
         >
           <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#DC2626]">
             <LogOut size={22} strokeWidth={1.7} />
@@ -522,11 +522,11 @@ const MobileDashboardChrome = ({ children }: { children: ReactNode }) => {
   const isAdmin = resolvedRole === "admin";
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#101318]">
       {/*
         Barra de marca, no lugar do preto #050505 que havia antes: é a faixa da cor da
         marca com a logo e os ícones bare, como no cabeçalho da referência. Os ícones
-        perderam a pastilha `bg-white/10` — sobre a cor cheia ela virava ruído.
+        perderam a pastilha `bg-[#101318]/10` — sobre a cor cheia ela virava ruído.
       */}
       {!isRootDashboard && !isAccountPage && !isModelsRoute && !isAtlasRoute && !isCatalogList && !isOrdersList && (
         <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between bg-[#2563EB] px-4">
@@ -552,7 +552,7 @@ const MobileDashboardChrome = ({ children }: { children: ReactNode }) => {
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
-                  className="-ml-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition-colors active:bg-white/15"
+                  className="-ml-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition-colors active:bg-[#101318]/15"
                   aria-label="Voltar"
                 >
                   <ArrowLeft size={20} />
@@ -570,7 +570,7 @@ const MobileDashboardChrome = ({ children }: { children: ReactNode }) => {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/catalogo")}
-                className="flex h-10 w-10 items-center justify-center rounded-full text-white transition-colors active:bg-white/15"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-white transition-colors active:bg-[#101318]/15"
                 aria-label="Buscar no catálogo"
               >
                 <Search size={20} strokeWidth={2} />
@@ -614,7 +614,7 @@ const MobileDashboardChrome = ({ children }: { children: ReactNode }) => {
 
       <nav
         data-velo-flat-buttons
-        className={`fixed inset-x-0 bottom-0 z-40 border-t border-black/[0.06] bg-white px-3 pb-[calc(18px+env(safe-area-inset-bottom))] pt-4 md:hidden ${
+        className={`fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#101318] px-3 pb-[calc(18px+env(safe-area-inset-bottom))] pt-4 md:hidden ${
           isAtlasRoute ? "hidden" : ""
         }`}
       >
@@ -926,7 +926,7 @@ const DashboardLayoutInner = () => {
 
   if (isSettingsRoute) {
     return (
-      <div className="dashboard-inter flex min-h-svh flex-col bg-white dark:bg-[#111113]">
+      <div className="dashboard-inter flex min-h-svh flex-col bg-[#101318] dark:bg-[#111113]">
         <PageErrorBoundary key={location.pathname}>
           <PageOutlet settingsReturnTo={settingsReturnTo.current} />
         </PageErrorBoundary>
@@ -975,7 +975,7 @@ const DashboardLayoutInner = () => {
     <div 
       className="dashboard-inter flex h-screen min-h-0 w-full max-w-full overflow-x-hidden flex-col" 
       style={{ 
-        background: isStartMode ? "#FFA640" : "linear-gradient(135deg, #F7F6F4 0%, #EFEDEA 48%, #E8E7E4 100%)",
+        background: isStartMode ? "#FFA640" : "linear-gradient(135deg, #090B10 0%, #0D1119 48%, #111827 100%)",
         paddingTop: 0,
         transition: "background-color 280ms ease"
       }}
