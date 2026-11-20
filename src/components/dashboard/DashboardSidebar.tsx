@@ -188,7 +188,7 @@ const getTrialEndsAt = (subscription: SidebarSubscription | null) => {
 const VeloIconOnly = () => (
   <img
     aria-hidden="true"
-    src="/logo.png"
+    src="/fornece-cloud.svg"
     alt=""
     // 38px mantém a presença da marca sem deixar o topo mais pesado que a referência.
     style={{ width: 38, height: 38, objectFit: "contain", flexShrink: 0, display: "block" }}
@@ -346,7 +346,7 @@ const DashboardSidebar = () => {
     nome || (user?.user_metadata?.full_name as string | undefined),
     user?.email,
   );
-  const profileEmail = user?.email || "conta@velo.app";
+  const profileEmail = user?.email || "conta@fornececloud.app";
   const metadataRole =
     (user?.app_metadata?.role as string | undefined) ??
     (user?.user_metadata?.role as string | undefined) ??
@@ -605,7 +605,7 @@ const DashboardSidebar = () => {
       <header style={styles.header}>
         <Link to="/dashboard" style={styles.brand}>
           <VeloIconOnly />
-          <span style={styles.brandText}>Velo</span>
+          <span style={styles.brandText}>Fornece Cloud</span>
         </Link>
       </header>
 
