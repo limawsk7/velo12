@@ -29,7 +29,13 @@ const CaktoActivationPage = () => {
         if (code === "ACCOUNT_ALREADY_EXISTS" || code === "ALREADY_ACTIVATED") {
           setExistingAccount(true);
         }
-        throw new Error(data?.error || invokeError?.message || "Não foi possível validar sua compra.");
+        const status = (invokeError as any)?.context?.status;
+        const message = status === 404
+          ? "Não encontramos uma compra aprovada para este e-mail. Confira se usou o mesmo e-mail da compra e se o pagamento já foi confirmado pela Cakto."
+          : status === 409
+            ? "Seu pagamento foi localizado, mas sua conta ainda está sendo preparada ou já foi ativada. Tente novamente em instantes ou entre no login."
+            : data?.error || "Não foi possível validar sua compra. Tente novamente.";
+        throw new Error(message);
       }
 
       if (!data?.actionLink) throw new Error("Não recebemos o link seguro de ativação. Tente novamente.");
