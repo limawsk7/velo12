@@ -25,7 +25,7 @@ type Order = {
 const money = (cents: number) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const date = (value?: string | null) => value ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(value)) : "—";
 const planName = (plan: string) => ({ base: "Base", pro: "Pro", business: "Business" }[plan] ?? plan);
-const statusName = (status: string) => ({ paid: "Ativo", expired: "Expirado", cancelled: "Cancelado", refunded: "Reembolsado", chargeback: "Chargeback", pending: "Pendente", failed: "Falhou" }[status] ?? status);
+const statusName = (status: string) => ({ paid: "Ativo", expired: "Expirado", cancelled: "Cancelado", canceled: "Cancelado", refunded: "Reembolsado", chargeback: "Chargeback", pending: "Pendente", failed: "Falhou" }[status] ?? status);
 
 export default function AdminCaktoSubscriptionsPage() {
   const { user, loading: authLoading } = useAuth();
