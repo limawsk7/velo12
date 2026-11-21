@@ -9,7 +9,8 @@ Deno.serve(async (req) => {
     Deno.env.get("PUBLIC_APP_URL") ||
     Deno.env.get("APP_URL") ||
     "https://velo-web-production-10c44cdf.up.railway.app"
-  ).replace(/\\/+$/, "");
+  );
+  while (appUrl.endsWith("/")) appUrl = appUrl.slice(0, -1);
   const dashboardUrl = `${appUrl}/dashboard/configuracoes`;
 
   // O Mercado Livre pode devolver error/error_description sem code/state.
