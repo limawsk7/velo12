@@ -4,18 +4,49 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
-
   const appUrl = (
     Deno.env.get("VITE_PUBLIC_APP_URL") ||
     Deno.env.get("PUBLIC_APP_URL") ||
     Deno.env.get("APP_URL") ||
     "https://velo-web-production-10c44cdf.up.railway.app"
-  ).replace(/\/+$/, "");
-  // /dashboard/integracoes hoje é a página de lojas Shopify; o Mercado Livre vive em Configurações.
+  ).replace(/\\/+$/, "");
   const dashboardUrl = `${appUrl}/dashboard/configuracoes`;
-  console.log("[ml-callback] retorno iniciado", { hasCode: Boolean(code), hasState: Boolean(state), appUrl });
+
+  // O Mercado Livre pode devolver error/error_description sem code/state.
+  const oauthError = url.searchParams.get("error");
+  const oauthErrorDescription = url.searchParams.get("error_description");
+  const oauthErrorSubtype = url.searchParams.get("error_subtype");
+  const oauthErrorUri = url.searchParams.get("error_uri");
+
+  console.log("[ml-callback] retorno iniciado", {
+    hasCode: Boolean(code),
+    hasState: Boolean(state),
+    hasOauthError: Boolean(oauthError),
+    queryKeys: [...url.searchParams.keys()],
+  });
+
+  if (oauthError) {
+    console.warn("[ml-callback] erro OAuth retornado pelo Mercado Livre", {
+      error: oauthError.slice(0, 120),
+      error_subtype: oauthErrorSubtype?.slice(0, 120) ?? null,
+      error_description: oauthErrorDescription?.slice(0, 300) ?? null,
+      error_uri: oauthErrorUri?.slice(0, 300) ?? null,
+    });
+    const params = new URLSearchParams({
+      ml_error: "authorization_denied",
+      ml_error_code: oauthError.slice(0, 120),
+    });
+    if (oauthErrorDescription) params.set("ml_error_description", oauthErrorDescription.slice(0, 300));
+    if (oauthErrorSubtype) params.set("ml_error_subtype", oauthErrorSubtype.slice(0, 120));
+    return new Response(null, { status: 302, headers: { Location: `${dashboardUrl}?${params.toString()}` } });
+  }
 
   if (!code || !state) {
+    console.error("[ml-callback] retorno sem parâmetros OAuth", {
+      hasCode: Boolean(code),
+      hasState: Boolean(state),
+      queryKeys: [...url.searchParams.keys()],
+    });
     return new Response(null, {
       status: 302,
       headers: { Location: `${dashboardUrl}?ml_error=missing_params` },
@@ -34,17 +65,9 @@ Deno.serve(async (req) => {
     .eq("state", state)
     .maybeSingle();
 
-  if (
-    stateError ||
-    !oauthState ||
-    oauthState.consumed_at ||
-    new Date(oauthState.expires_at).getTime() <= Date.now()
-  ) {
-    console.error("[ml-callback] invalid state:", stateError?.message ?? state);
-    return new Response(null, {
-      status: 302,
-      headers: { Location: `${dashboardUrl}?ml_error=invalid_state` },
-    });
+  if (stateError || !oauthState || oauthState.consumed_at || new Date(oauthState.expires_at).getTime() <= Date.now()) {
+    console.error("[ml-callback] invalid state:", stateError?.message ?? "state ausente, consumido ou expirado");
+    return new Response(null, { status: 302, headers: { Location: `${dashboardUrl}?ml_error=invalid_state` } });
   }
 
   const { error: consumeError } = await supabase
@@ -55,10 +78,7 @@ Deno.serve(async (req) => {
 
   if (consumeError) {
     console.error("[ml-callback] state consume error:", consumeError.message);
-    return new Response(null, {
-      status: 302,
-      headers: { Location: `${dashboardUrl}?ml_error=invalid_state` },
-    });
+    return new Response(null, { status: 302, headers: { Location: `${dashboardUrl}?ml_error=invalid_state` } });
   }
 
   let tokens: Record<string, any>;
@@ -75,23 +95,28 @@ Deno.serve(async (req) => {
       }),
     });
     tokens = await tokenRes.json();
-  } catch {
-    return new Response(null, {
-      status: 302,
-      headers: { Location: `${dashboardUrl}?ml_error=token_failed` },
-    });
+    if (!tokenRes.ok) {
+      console.error("[ml-callback] falha na troca do token", {
+        status: tokenRes.status,
+        error: tokens?.error ?? null,
+        message: tokens?.message ?? null,
+        cause: Array.isArray(tokens?.cause) ? tokens.cause.slice(0, 3) : null,
+      });
+      return new Response(null, { status: 302, headers: { Location: `${dashboardUrl}?ml_error=token_failed` } });
+    }
+  } catch (err) {
+    console.error("[ml-callback] erro de rede na troca do token", String(err));
+    return new Response(null, { status: 302, headers: { Location: `${dashboardUrl}?ml_error=token_failed` } });
   }
 
-  if (!tokens.access_token) {
-    console.error("ML token error:", JSON.stringify(tokens));
-    return new Response(null, {
-      status: 302,
-      headers: { Location: `${dashboardUrl}?ml_error=token_failed` },
+  if (!tokens?.access_token) {
+    console.error("[ml-callback] resposta de token sem access_token", {
+      error: tokens?.error ?? null,
+      message: tokens?.message ?? null,
     });
+    return new Response(null, { status: 302, headers: { Location: `${dashboardUrl}?ml_error=token_failed` } });
   }
 
-  // Apelido da conta (GET /users/me): mostra ao cliente e ao suporte qual conta
-  // está ligada. Falha aqui nunca impede a conexão.
   let nickname: string | null = null;
   try {
     const meRes = await fetch("https://api.mercadolibre.com/users/me", {
@@ -102,7 +127,7 @@ Deno.serve(async (req) => {
       nickname = typeof me?.nickname === "string" ? me.nickname : null;
     }
   } catch (err) {
-    console.warn("[ml-callback] users/me falhou", err);
+    console.warn("[ml-callback] users/me falhou", String(err));
   }
 
   const { error } = await supabase.from("user_integrations").upsert(
@@ -112,11 +137,9 @@ Deno.serve(async (req) => {
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token ?? null,
       ml_user_id: tokens.user_id ?? null,
-      // Sem apelido: limpa o antigo (pode ser de outra conta) e a tela busca de novo.
       ml_nickname: nickname,
       ml_nickname_updated_at: nickname ? new Date().toISOString() : null,
       expires_at: new Date(Date.now() + (tokens.expires_in ?? 21600) * 1000).toISOString(),
-      // Reconexão gera token novo do app atual: limpa a marca de token morto.
       refresh_failed_at: null,
       updated_at: new Date().toISOString(),
     },
@@ -124,16 +147,10 @@ Deno.serve(async (req) => {
   );
 
   if (error) {
-    console.error("Supabase upsert error:", error.message);
-    return new Response(null, {
-      status: 302,
-      headers: { Location: `${dashboardUrl}?ml_error=db_failed` },
-    });
+    console.error("[ml-callback] Supabase upsert error:", error.message);
+    return new Response(null, { status: 302, headers: { Location: `${dashboardUrl}?ml_error=db_failed` } });
   }
 
   console.log("[ml-callback] conexão concluída", { user_id: oauthState.user_id, ml_user_id: tokens.user_id ?? null });
-  return new Response(null, {
-    status: 302,
-    headers: { Location: `${dashboardUrl}?ml_connected=true` },
-  });
+  return new Response(null, { status: 302, headers: { Location: `${dashboardUrl}?ml_connected=true` } });
 });
