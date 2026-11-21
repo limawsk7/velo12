@@ -80,7 +80,7 @@ const QUESTIONS: Question[] = [
     kind: "text",
     id: "nome",
     label: "Como podemos te chamar?",
-    subtitle: "Só o primeiro nome, para a Velo falar com você.",
+    subtitle: "Só o primeiro nome, para a Fornece Cloud falar com você.",
     placeholder: "Seu primeiro nome",
   },
   {
@@ -235,7 +235,7 @@ const SERIF = '"Instrument Serif", "Iowan Old Style", "Times New Roman", serif';
 const SANS = '"Inter", system-ui, -apple-system, sans-serif';
 
 const BACKGROUND_SRC = "/assets/onboarding-fundo.jpg";
-const VELO_LOGO_SRC = "/logo.png";
+const VELO_LOGO_SRC = "/fornece-cloud.svg";
 
 /*
   PARA REVISÃO (Felipe): passos genéricos de criação de conta no Mercado Livre.
@@ -663,7 +663,7 @@ const OnboardingModal = ({ onComplete, onSkipToCatalog }: OnboardingModalProps) 
 
     const titulo =
       screen.kind === "welcome"
-        ? "Bem-vindo à Velo"
+        ? "Bem-vindo à Fornece Cloud"
         : screen.kind === "ml-guide"
           ? "Crie sua conta no Mercado Livre"
           : screen.question.label;
@@ -698,7 +698,7 @@ const OnboardingModal = ({ onComplete, onSkipToCatalog }: OnboardingModalProps) 
         className="fixed inset-0 z-[120] flex flex-col overflow-hidden"
         role="dialog"
         aria-modal="true"
-        aria-label="Boas-vindas da Velo"
+        aria-label="Boas-vindas da Fornece Cloud"
         data-velo-flat-buttons=""
         initial={reduce ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -787,7 +787,7 @@ const OnboardingModal = ({ onComplete, onSkipToCatalog }: OnboardingModalProps) 
                       </div>
                       <div className="px-3 pb-3.5 pt-2.5 text-center">
                         <p className="truncate text-[14px] font-semibold leading-tight text-[#0B1B3D]">Olá, {nomeDigitado || "…"}!</p>
-                        <p className="mt-0.5 text-[10.5px] text-[#64748B]">É assim que a Velo vai te chamar</p>
+                        <p className="mt-0.5 text-[10.5px] text-[#64748B]">É assim que a Fornece Cloud vai te chamar</p>
                         <div className="mx-auto mt-2.5 space-y-1.5">
                           <span className="block h-1.5 w-full rounded-full bg-[#EEF2F7]" />
                           <span className="mx-auto block h-1.5 w-2/3 rounded-full bg-[#EEF2F7]" />
@@ -890,11 +890,11 @@ const OnboardingModal = ({ onComplete, onSkipToCatalog }: OnboardingModalProps) 
                             <Icon size={19} strokeWidth={1.9} />
                           </span>
                           <span className="flex min-w-0 flex-1 flex-col">
-                            <span className={`text-[16px] font-semibold leading-tight ${selected ? "text-[#0B1B3D]" : "text-white"}`}>
+                            <span className="text-[16px] font-semibold leading-tight" style={{ color: selected ? "#0B1B3D" : "#FFFFFF" }}>
                               {option.label}
                             </span>
                             {option.description ? (
-                              <span className={`mt-0.5 text-[13px] leading-snug ${selected ? "text-[#64748B]" : "text-white/55"}`}>
+                              <span className="mt-0.5 text-[13px] leading-snug" style={{ color: selected ? "#64748B" : "rgba(255,255,255,0.82)" }}>
                                 {option.description}
                               </span>
                             ) : null}
@@ -933,7 +933,8 @@ const OnboardingModal = ({ onComplete, onSkipToCatalog }: OnboardingModalProps) 
                               <Icon size={18} strokeWidth={2} />
                             </span>
                             <span
-                              className={`text-[15px] font-semibold leading-tight ${selected ? "text-[#0B1B3D]" : "text-white"}`}
+                              className="text-[15px] font-semibold leading-tight"
+                              style={{ color: selected ? "#0B1B3D" : "#FFFFFF" }}
                             >
                               {option.label}
                             </span>
@@ -1041,12 +1042,12 @@ const OnboardingModal = ({ onComplete, onSkipToCatalog }: OnboardingModalProps) 
         transition={{ duration: reduce ? 0.001 : 0.8, delay: reduce ? 0 : 0.3, ease: EASE }}
       >
         <div className="flex items-center gap-2.5">
-          <img src={VELO_LOGO_SRC} alt="" className="block h-[34px] w-[34px] object-contain" />
+          <img src={VELO_LOGO_SRC} alt="" className="block h-[38px] w-[38px] object-contain" />
           <span
             className="text-[20px] font-semibold leading-none text-white"
             style={{ letterSpacing: "-0.03em", textShadow: "0 1px 2px rgba(0,0,0,0.12)" }}
           >
-            Velo
+            Fornece Cloud
           </span>
         </div>
         <button
@@ -1099,7 +1100,7 @@ const OnboardingModal = ({ onComplete, onSkipToCatalog }: OnboardingModalProps) 
                   className="max-w-[320px] text-[31px] leading-[1.12]"
                   style={{ fontFamily: SERIF, color: INK, letterSpacing: "-0.01em", fontWeight: 400 }}
                 >
-                  Boas-vindas! Vamos deixar a Velo do seu jeito
+                  Boas-vindas! Vamos deixar a Fornece Cloud do seu jeito
                 </motion.h1>
                 <motion.p
                   variants={itemVariants}
