@@ -3,6 +3,9 @@ import { Navigate } from "react-router-dom";
 import { useQuery, type QueryClient } from "@tanstack/react-query";
 import {
   Bell,
+  CheckCircle2,
+  Copy,
+  X,
   RefreshCw,
   ChevronDown,
   ChevronLeft,
@@ -143,6 +146,33 @@ const AdminUsersPage = () => {
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createName, setCreateName] = useState("");
+  const [createEmail, setCreateEmail] = useState("");
+  const [createPlan, setCreatePlan] = useState("base");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [createdCredentials, setCreatedCredentials] = useState<{ email: string; password: string; plan: string } | null>(null);
+
+  const handleCreateUser = async () => {
+    setCreateError("");
+    setCreating(true);
+    try {
+      const { data: result, error: invokeError } = await supabase.functions.invoke("admin-users", {
+        body: { action: "create", name: createName.trim(), email: createEmail.trim(), plan: createPlan },
+      });
+      if (invokeError || result?.error) throw new Error(result?.error || invokeError?.message || "Não foi possível criar a conta.");
+      setCreatedCredentials({ email: result.email, password: result.initial_password, plan: result.plan });
+      setCreateName("");
+      setCreateEmail("");
+      setCreatePlan("base");
+      await Promise.all([refetch(), counts.refetch()]);
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : "Erro ao criar usuário.");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
   useEffect(() => {
@@ -183,6 +213,9 @@ const AdminUsersPage = () => {
       title="Usuários"
       actions={
         <>
+          <Button size="sm" onClick={() => { setCreateError(""); setCreatedCredentials(null); setCreateOpen(true); }}>
+            <Plus size={14} /> Criar usuário
+          </Button>
           <div className="relative">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A8F9B]" />
             <input
@@ -329,6 +362,68 @@ const AdminUsersPage = () => {
         </section>
       </div>
       <AdminUserDetailModal userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
+
+      {createOpen && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setCreateOpen(false); }}>
+          <section className="w-full max-w-[460px] overflow-hidden rounded-[22px] border border-[#E6EAF2] bg-white shadow-[0_24px_80px_rgba(15,23,42,0.24)]">
+            <header className="flex items-center justify-between border-b border-[#EEF1F6] px-6 py-5">
+              <div>
+                <h2 className="text-[17px] font-semibold text-[#171715]">{createdCredentials ? "Conta criada" : "Criar usuário"}</h2>
+                <p className="mt-1 text-[12px] text-[#64748B]">{createdCredentials ? "Acesso liberado para o cliente." : "Cadastre manualmente um cliente no Fornece Cloud."}</p>
+              </div>
+              <button onClick={() => setCreateOpen(false)} className="rounded-full p-2 text-[#64748B] hover:bg-[#F1F5F9]" aria-label="Fechar"><X size={17} /></button>
+            </header>
+
+            {createdCredentials ? (
+              <div className="space-y-4 p-6">
+                <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                  <CheckCircle2 className="mt-0.5 text-emerald-600" size={18} />
+                  <div>
+                    <p className="text-[13px] font-semibold text-emerald-900">Usuário criado e autorizado</p>
+                    <p className="mt-1 text-[12px] leading-5 text-emerald-800">A conta já pode entrar no site com os dados abaixo. Guarde a senha e envie ao cliente por um canal seguro.</p>
+                  </div>
+                </div>
+                <CredentialRow label="E-mail" value={createdCredentials.email} />
+                <CredentialRow label="Senha temporária" value={createdCredentials.password} />
+                <CredentialRow label="Plano" value={formatPlan(createdCredentials.plan)} />
+                <Button className="w-full" onClick={() => { void navigator.clipboard?.writeText(`E-mail: ${createdCredentials.email}\nSenha: ${createdCredentials.password}`); }}>
+                  <Copy size={14} /> Copiar acesso
+                </Button>
+                <Button variant="outline" className="w-full" onClick={() => { setCreatedCredentials(null); setCreateOpen(false); }}>Concluir</Button>
+              </div>
+            ) : (
+              <div className="space-y-4 p-6">
+                <label className="block space-y-1.5">
+                  <span className="text-[12px] font-medium text-[#475569]">Nome do cliente</span>
+                  <input value={createName} onChange={(e) => setCreateName(e.target.value)} placeholder="Nome completo" className="h-11 w-full rounded-xl border border-[#DDE3EE] px-3 text-[13px] outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#DCE7FF]" />
+                </label>
+                <label className="block space-y-1.5">
+                  <span className="text-[12px] font-medium text-[#475569]">E-mail de acesso</span>
+                  <input type="email" value={createEmail} onChange={(e) => setCreateEmail(e.target.value)} placeholder="cliente@email.com" className="h-11 w-full rounded-xl border border-[#DDE3EE] px-3 text-[13px] outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#DCE7FF]" />
+                </label>
+                <label className="block space-y-1.5">
+                  <span className="text-[12px] font-medium text-[#475569]">Plano</span>
+                  <select value={createPlan} onChange={(e) => setCreatePlan(e.target.value)} className="h-11 w-full rounded-xl border border-[#DDE3EE] bg-white px-3 text-[13px] outline-none focus:border-[#2563EB]">
+                    <option value="gratis">Gratuito</option>
+                    <option value="base">Base</option>
+                    <option value="pro">Pro</option>
+                    <option value="business">Business</option>
+                  </select>
+                </label>
+                {createError && <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700">{createError}</p>}
+                <div className="rounded-xl bg-[#F8FAFC] p-3 text-[11px] leading-5 text-[#64748B]">A conta será criada com e-mail confirmado e acesso liberado. Uma senha temporária será gerada para você entregar ao cliente.</div>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1" onClick={() => setCreateOpen(false)} disabled={creating}>Cancelar</Button>
+                  <Button className="flex-1" onClick={() => void handleCreateUser()} disabled={creating || !createName.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(createEmail.trim())}>
+                    {creating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                    {creating ? "Criando..." : "Criar conta"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </AdminShell>
   );
 };
@@ -511,3 +606,11 @@ const Pagination = ({
 };
 
 export default AdminUsersPage;
+
+
+const CredentialRow = ({ label, value }: { label: string; value: string }) => (
+  <div className="rounded-xl border border-[#E6EAF2] px-3 py-2.5">
+    <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#94A3B8]">{label}</p>
+    <p className="mt-1 break-all font-mono text-[13px] text-[#171715]">{value}</p>
+  </div>
+);
