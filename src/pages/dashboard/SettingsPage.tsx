@@ -61,6 +61,31 @@ const SettingsPage = () => {
   const returnTo = useOutletContext<string | undefined>();
   const tabParam = searchParams.get("tab");
   const tab = isTabId(tabParam) ? tabParam : "Perfil";
+  const mlError = searchParams.get("ml_error");
+  const mlErrorCode = searchParams.get("ml_error_code");
+  const mlErrorDescription = searchParams.get("ml_error_description");
+  const mlErrorMessages: Record<string, string> = {
+    access_denied: "A autorização foi cancelada ou recusada na conta do Mercado Livre.",
+    invalid_client: "O Mercado Livre não reconheceu o aplicativo conectado.",
+    unauthorized_client: "O aplicativo não está autorizado a solicitar esta conexão.",
+    unauthorized_application: "O aplicativo não está autorizado para esta conta ou operação.",
+    invalid_scope: "As permissões solicitadas pelo aplicativo não foram aceitas.",
+    server_error: "O Mercado Livre apresentou uma falha temporária durante a autorização.",
+    temporarily_unavailable: "A autorização do Mercado Livre está temporariamente indisponível.",
+  };
+  const mlErrorText = mlErrorCode
+    ? mlErrorMessages[mlErrorCode] ?? `O Mercado Livre retornou o código: ${mlErrorCode}.`
+    : mlError === "missing_params"
+      ? "O Mercado Livre retornou sem o código de autorização. Nenhuma conta foi conectada."
+      : mlError === "invalid_state"
+        ? "A tentativa de conexão expirou ou não corresponde à sessão iniciada. Inicie a conexão novamente."
+        : mlError === "token_failed"
+          ? "O Mercado Livre autorizou o retorno, mas a troca do código pelo token falhou."
+          : mlError === "db_failed"
+            ? "A autorização ocorreu, mas não foi possível salvar a conexão na conta."
+            : mlError === "authorization_denied"
+              ? "O Mercado Livre não concluiu a autorização."
+              : "";
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const visibleItems = NAV.filter((item) => normalizeSearch(item.id).includes(normalizeSearch(query)));
@@ -143,6 +168,18 @@ const SettingsPage = () => {
       <main ref={contentRef} className="min-w-0 flex-1 px-4 py-6 sm:px-8 md:overflow-y-auto md:py-8 lg:px-12">
         <div className="mx-auto w-full max-w-[880px]">
           <h1 className="mb-8 text-[26px] font-semibold leading-tight tracking-tight md:mb-10 md:text-[30px]">{tab}</h1>
+          {mlError && (
+            <div role="alert" className="mb-6 rounded-xl border border-red-500/25 bg-red-500/[0.07] px-4 py-3.5 text-sm text-red-700 dark:text-red-300">
+              <p className="font-semibold">Não foi possível conectar o Mercado Livre</p>
+              <p className="mt-1">{mlErrorText || "Ocorreu um erro durante a autorização."}</p>
+              {mlErrorDescription && (
+                <p className="mt-2 rounded-lg bg-black/[0.04] px-3 py-2 text-xs dark:bg-white/[0.06]">
+                  Detalhe informado pelo Mercado Livre: {mlErrorDescription}
+                </p>
+              )}
+              <p className="mt-2 text-xs opacity-80">Nenhuma alteração foi feita na sua conta do Mercado Livre. Você pode tentar conectar novamente.</p>
+            </div>
+          )}
           {tab === "Perfil" && <ProfileTab />}
           {tab === "Minhas Lojas" && <StoresTab />}
           {tab === "Integrações" && <IntegrationsTab />}
