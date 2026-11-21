@@ -9,10 +9,11 @@ Deno.serve(async (req) => {
     Deno.env.get("VITE_PUBLIC_APP_URL") ||
     Deno.env.get("PUBLIC_APP_URL") ||
     Deno.env.get("APP_URL") ||
-    "https://velods.com.br"
+    "https://velo-web-production-10c44cdf.up.railway.app"
   ).replace(/\/+$/, "");
   // /dashboard/integracoes hoje é a página de lojas Shopify; o Mercado Livre vive em Configurações.
   const dashboardUrl = `${appUrl}/dashboard/configuracoes`;
+  console.log("[ml-callback] retorno iniciado", { hasCode: Boolean(code), hasState: Boolean(state), appUrl });
 
   if (!code || !state) {
     return new Response(null, {
@@ -130,6 +131,7 @@ Deno.serve(async (req) => {
     });
   }
 
+  console.log("[ml-callback] conexão concluída", { user_id: oauthState.user_id, ml_user_id: tokens.user_id ?? null });
   return new Response(null, {
     status: 302,
     headers: { Location: `${dashboardUrl}?ml_connected=true` },
