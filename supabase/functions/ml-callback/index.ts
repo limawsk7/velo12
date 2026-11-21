@@ -4,7 +4,7 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
-  const appUrl = (
+  let appUrl = (
     Deno.env.get("VITE_PUBLIC_APP_URL") ||
     Deno.env.get("PUBLIC_APP_URL") ||
     Deno.env.get("APP_URL") ||
